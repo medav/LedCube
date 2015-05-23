@@ -71,7 +71,15 @@ namespace LedCubeDriver
         #endregion
 
         #region Text Operations
+        public void PutCh(char ch, int face)
+        {
+            // TODO: 
+        }
 
+        public void PutStr(string str, int speed)
+        {
+            // TODO: 
+        }
         #endregion
 
     }
