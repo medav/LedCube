@@ -8,7 +8,7 @@ using Windows.Devices.SerialCommunication;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 
-namespace LedCubeDriver
+namespace LedCube
 {
     public class LCD
     {
