@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.Devices.SerialCommunication;
+using Windows.Devices.Gpio;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 
@@ -20,7 +21,7 @@ namespace LedCube
         #region Constructor
         public LCD()
         {
-            SerialDevice.FromIdAsync("COM5").Completed += (IAsyncOperation<SerialDevice>  ao, AsyncStatus s) => {
+            SerialDevice.FromIdAsync("COM2").Completed += (IAsyncOperation<SerialDevice>  ao, AsyncStatus s) => {
                 sd = ao.GetResults();
                 sd.BaudRate = 38400;
             };
