@@ -12,7 +12,10 @@ namespace LedCube
     public class LCD
     {
         #region Member Variables
+        // Serial port for connecting with PIC via UART
         private SerialPort sp;
+        
+        // Internal buffer to be used for communication
         private byte[] buffer = new byte[128];
         #endregion
 
@@ -27,7 +30,6 @@ namespace LedCube
             sp.WriteTimeout = 500;
 
             sp.Open();
-
         }
         #endregion
 

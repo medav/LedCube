@@ -32,6 +32,11 @@ namespace LedCube.Animations
             anim.Start();
         }
 
+        public void Join()
+        {
+            anim.Wait();
+        }
+
         public void Stop()
         {
             cts.Cancel();
@@ -39,11 +44,16 @@ namespace LedCube.Animations
         #endregion
 
         #region Animation Specific
+        // These are to be implemented by derived animations
+
+        // Setup is called once before the animation begins
         virtual protected void Setup()
         {
 
         }
-
+        
+        // Run is called in a separate thread. It is assumed
+        // that this runs an infinite loop
         virtual protected void Run()
         {
 
