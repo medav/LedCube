@@ -64,7 +64,7 @@ namespace LedCube
         #region Frame Control
         public void ClearBuffer()
         {
-            Array.Clear(buffer, 0, 128);
+            Array.Clear(buffer, 1, 128);
         }
 
         public void WriteBuffer()
