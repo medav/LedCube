@@ -49,6 +49,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LedCubeAnimations\LedCubeAnimations.csproj">
+      <Project>{69285c33-383a-4425-859d-904c1c89fa08}</Project>
+      <Name>LedCubeAnimations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LedCubeDriver\LedCubeDriver.csproj">
+      <Project>{89ac2dc9-289d-4aca-b213-a3aac804b11d}</Project>
+      <Name>LedCubeDriver</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

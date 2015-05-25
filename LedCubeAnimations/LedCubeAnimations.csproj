@@ -42,6 +42,13 @@
   <ItemGroup>
     <Compile Include="BaseAnim.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Wave.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LedCubeDriver\LedCubeDriver.csproj">
+      <Project>{89ac2dc9-289d-4aca-b213-a3aac804b11d}</Project>
+      <Name>LedCubeDriver</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

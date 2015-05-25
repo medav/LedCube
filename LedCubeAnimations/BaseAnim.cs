@@ -13,7 +13,7 @@ namespace LedCube.Animations
         #region Member Variables
         private Task anim;
         private CancellationTokenSource cts;
-        private LCD cube;
+        protected LCD cube;
         #endregion
 
         #region Animation Setup
