@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.Storage.Streams;
-using Windows.Devices.SerialCommunication;
-using Windows.Devices.Gpio;
+using System.IO.Ports;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 
@@ -14,17 +12,22 @@ namespace LedCube
     public class LCD
     {
         #region Member Variables
-        private SerialDevice sd;
+        private SerialPort sp;
         private byte[] buffer = new byte[128];
         #endregion
 
         #region Constructor
         public LCD()
         {
-            SerialDevice.FromIdAsync("COM2").Completed += (IAsyncOperation<SerialDevice>  ao, AsyncStatus s) => {
-                sd = ao.GetResults();
-                sd.BaudRate = 38400;
-            };
+            sp = new SerialPort();
+            sp.PortName = "/dev/ttyAMA0";
+            sp.BaudRate = 38400;
+
+            sp.ReadTimeout = 500;
+            sp.WriteTimeout = 500;
+
+            sp.Open();
+
         }
         #endregion
 
@@ -65,22 +68,14 @@ namespace LedCube
             Array.Clear(buffer, 0, 128);
         }
 
-        public async void WriteBuffer()
+        public void WriteBuffer()
         {
-            await sd.OutputStream.WriteAsync(buffer.AsBuffer());
+            sp.Write(buffer, 0, 128);
         }
         #endregion
 
         #region Text Operations
-        public void PutCh(char ch, int face)
-        {
-            // TODO: 
-        }
 
-        public void PutStr(string str, int speed)
-        {
-            // TODO: 
-        }
         #endregion
 
     }
