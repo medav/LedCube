@@ -10,7 +10,7 @@ namespace LedCube
         private SerialPort sp;
         
         // Internal buffer to be used for communication
-        private byte[] buffer = new byte[128];
+        private byte[] buffer = new byte[130];
         #endregion
 
         #region Constructor
@@ -23,6 +23,9 @@ namespace LedCube
             sp.ReadTimeout = 500;
             sp.WriteTimeout = 500;
 
+            buffer[0] = (byte) 's';
+            buffer[129] = 0xFF;
+
             sp.Open();
         }
         #endregion
@@ -32,7 +35,7 @@ namespace LedCube
         {
             int i = 16 * z + 2 * y + (x > 3 ? 1 : 0);
             int o = (x % 4) * 2;
-            buffer[i] = (byte) ((buffer[i] & ~(0x03 << o)) | v << o);
+            buffer[i + 1] = (byte) ((buffer[i + 1] & ~(0x03 << o)) | v << o);
         }
 
         public void LedOn(byte x, byte y, byte z)
@@ -54,7 +57,7 @@ namespace LedCube
         {
             int i = 16 * z + 2 * y + (x > 3 ? 1 : 0);
             int o = (x % 4) * 2;
-            return (byte) ((buffer[i] >> o) & 0x03);
+            return (byte) ((buffer[i + 1] >> o) & 0x03);
         }
         #endregion
 
@@ -66,7 +69,7 @@ namespace LedCube
 
         public void WriteBuffer()
         {
-            sp.Write(buffer, 0, 128);
+            sp.Write(buffer, 0, 130);
         }
         #endregion
 
