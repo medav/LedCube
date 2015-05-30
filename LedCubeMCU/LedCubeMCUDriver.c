@@ -96,7 +96,39 @@ void SetDefaults() {
     memset(buffer, 0x00, BUFFERSIZE);
 }
 
-void Refresh();
-void IdlePattern();
-void SwapBuffers();
-void SetVar(CONTROLDATA var, int val);
+void Refresh() {
+
+}
+
+void IdlePattern() {
+
+}
+
+void SwapBuffers() {
+    if(buffer_swap) {
+        buffer = buffer2;
+        backbuffer = buffer1;
+    }
+    else {
+         buffer = buffer1;
+         backbuffer = buffer2;
+    }
+    
+    buffer_swap = 1 - buffer_swap;
+}
+
+void SetVar(CONTROLDATA var, int val) {
+    switch(var) {
+    case V_LED_POWER_DURATION:
+        led_power_duration = val;
+        break;
+    case V_AUTO_IDLE_ENABLE:
+        auto_idle_enable = val;
+        break;
+    case V_AUTO_IDLE_TIMEOUT:
+        auto_idle_timeout = val;
+        break;
+    default:
+        break;
+    }
+}

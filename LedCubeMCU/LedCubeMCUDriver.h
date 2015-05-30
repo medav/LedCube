@@ -13,6 +13,7 @@ typedef enum {
 
 // ===== Adjustable control data =====
 // Enum for use with SETCONTROL command
+// Prefix 'V_' for 'Variable'
 typedef enum {
     V_LED_POWER_DURATION,
     V_AUTO_IDLE_ENABLE,
@@ -52,4 +53,8 @@ void Refresh();
 void IdlePattern();
 void SwapBuffers();
 void SetVar(CONTROLDATA var, int val);
+
+void LedSet(byte x, byte y, byte z, byte val);
+void LedOn(byte x, byte y, byte z);
+void LedOff(byte x, byte y, byte z);
 // ===================================
