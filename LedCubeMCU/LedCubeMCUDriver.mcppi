@@ -6,7 +6,7 @@ Value=0
 [BUILD_TYPE]
 Value=0
 [ACTIVE_TAB]
-Value=TLC59116.h
+Value=LedCubeMCUDriver.c
 [USE_EEPROM]
 Value=0
 [USE_HEAP]
@@ -25,10 +25,11 @@ Count=0
 Count=0
 ActiveImageIndex=-1
 [OPENED_FILES]
-Count=3
+Count=4
 File0=TLC59116.c
 File1=TLC59116.h
 File2=LedCubeMCUDriver.c
+File3=LedCubeMCUDriver.h
 [EEPROM]
 Count=0
 [ACTIVE_COMMENTS_FILES]
@@ -44,8 +45,9 @@ Path2=C:\Users\Mike\Source\Repos\LedCube\LedCubeMCU\
 Count=1
 Path0=C:\Users\Mike\Source\Repos\LedCube\LedCubeMCU\
 [HEADERS]
-Count=1
+Count=2
 File0=TLC59116.h
+File1=LedCubeMCUDriver.h
 [PLDS]
 Count=0
 [Useses]
