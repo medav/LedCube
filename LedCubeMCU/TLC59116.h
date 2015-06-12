@@ -1,3 +1,5 @@
+#ifndef TLC59116
+#define TLC59116
 
 // Typedef for 'byte' data
 typedef unsigned char byte;
@@ -57,3 +59,5 @@ void TLC59116_ResetAll();
 void TLC59116_Setup();
 void TLC59116_WriteReg(byte addr, byte reg, byte val);
 void TLC59116_WriteLEDs(byte addr, byte * val);
+
+#endif

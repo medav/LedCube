@@ -1,13 +1,18 @@
+#ifndef LEDCUBEMCUDRIVER
+#define LEDCUBEMCUDRIVER
 // Size for LED cube
 #define SIZE 8
 #define BUFFERSIZE 128
 
+#include "TLC59116.h"
+
 // Enum for commands
 typedef enum {
     NOOP,
-    STARTFRAME = 0x80,
+    READFRAME = 0x80,
     SETCONTROL,
     IDLE,
+    CLEAR = 0xEE,
     ENDCMD = 0xFF
 } CUBECMD;
 
@@ -35,6 +40,10 @@ byte buffer1[BUFFERSIZE];
 byte buffer2[BUFFERSIZE];
 byte * buffer, * backbuffer;
 byte buffer_swap;
+int buffer_counter;
+
+byte arg_buffer[64];
+int arg_counter;
 
 int auto_idle_counter;
 byte auto_idle_flag;
@@ -46,7 +55,8 @@ byte args[16];
 // ======= Function Prototypes =======
 void DispatchCmd();
 void InitUART();
-void InitI2C();
+void UARTRecieve();
+void InitDriverI2C();
 void Alive();
 void SetDefaults();
 void Refresh();
@@ -58,3 +68,5 @@ void LedSet(byte x, byte y, byte z, byte val);
 void LedOn(byte x, byte y, byte z);
 void LedOff(byte x, byte y, byte z);
 // ===================================
+
+#endif
