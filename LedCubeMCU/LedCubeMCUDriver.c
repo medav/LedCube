@@ -3,6 +3,7 @@
 
 void InterruptHandler() iv 0x0008 ics ICS_AUTO {
     if(RC1IF) {
+        LATD = 0x03;
         UARTRecieve();
     }
 }
@@ -18,10 +19,11 @@ void main() {
    TRISB = 0x00;
    TRISD = 0x00;
    LATB = 0x00;
+   
 
    SetDefaults();
    InitDriverI2C();
-   InitUART();
+   //InitUART();
    Alive();
 
    // Reset the Drivers
@@ -29,11 +31,25 @@ void main() {
    TLC59116_Setup();
 
    // Run Idle Pattern before allowing input
-   IdlePattern();
+   //IdlePattern();
 
    // Enable all interrupts
-   INTCON.GIE = 1;
-   INTCON.PEIE = 1;
+   //INTCON.GIE = 1;
+   //INTCON.PEIE = 1;
+   
+   
+    TLC59116_WriteLEDs(0, &buffer[0]);
+    TLC59116_WriteLEDs(1, &buffer[0]);
+    TLC59116_WriteLEDs(2, &buffer[0]);
+    TLC59116_WriteLEDs(3, &buffer[0]);
+    TLC59116_On();
+    
+    LATB = 0x01;
+
+
+    
+    while(1) { }
+        
 
    while(1) {
       Refresh();
@@ -61,10 +77,13 @@ void DispatchCmd() {
 }
 
 void InitUART() {
+    // 234 kBaud
     // Multiplier on
     TXSTA1.BRGH = 1;
+    
+    TXSTA1.BRG16 = 0;
 
-    // SPBRGH1:SPBRG1 = 0x0001
+    // SPBRGH1:SPBRG1 = 0x0010
     SPBRGH1 = 0;
     SPBRG1 = 16;
     //UART1_Init(2000000);
@@ -104,14 +123,19 @@ void UARTRecieve() {
 }
 
 void InitDriverI2C() {
-    I2C1_Init(900000);
+    I2C1_Init(400000);
 }
 
 void Alive() {
-    Delay_100ms();
-    LATD = 0x03;
-    Delay_100ms();
-    LATD = 0x00;
+    int i;
+
+    for(i = 0; i < 3; i++) {
+        Delay_100ms();
+        LATD = 0x03;
+        Delay_100ms();
+        LATD = 0x00;
+    }
+
     Delay_100ms();
     LATD = 0x03;
 }
@@ -126,7 +150,7 @@ void SetDefaults() {
     buffer_swap = 1;
     buffer = buffer1;
     backbuffer = buffer2;
-    memset(buffer, 0x00, BUFFERSIZE);
+    memset(buffer, 0x55, BUFFERSIZE);
 }
 
 void Refresh() {
@@ -137,14 +161,36 @@ void Refresh() {
         TLC59116_WriteLEDs(2, &buffer[l * 16 + 8]);
         TLC59116_WriteLEDs(3, &buffer[l * 16 + 12]);
         
-        LATD = 0x01 << l;
+        LATB = 0x01 << l;
+        TLC59116_On();
         Delay_Cyc(led_power_duration);
-        LATD = 0x00;
+        LATB = 0x00;
     }
 }
 
 void IdlePattern() {
-
+    int i, d;
+    
+    for(i = 0; i < 7; i++) {
+        LedOn(0, 0, i);
+        LedOn(7, 0, i);
+        LedOn(0, 7, i);
+        LedOn(7, 7, i);
+        
+        LedOn(0, i, 0);
+        LedOn(7, i, 0);
+        LedOn(0, i, 7);
+        LedOn(7, i, 7);
+        
+        LedOn(i, 0, 0);
+        LedOn(i, 7, 0);
+        LedOn(i, 0, 7);
+        LedOn(i, 7, 7);
+        
+        for(d = 0; d < 5; d++) {
+            Refresh();
+        }
+    }
 }
 
 void SwapBuffers() {
