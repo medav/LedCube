@@ -31,24 +31,11 @@ void main() {
    TLC59116_Setup();
 
    // Run Idle Pattern before allowing input
-   //IdlePattern();
+   IdlePattern();
 
    // Enable all interrupts
    //INTCON.GIE = 1;
    //INTCON.PEIE = 1;
-   
-   
-    TLC59116_WriteLEDs(0, &buffer[0]);
-    TLC59116_WriteLEDs(1, &buffer[0]);
-    TLC59116_WriteLEDs(2, &buffer[0]);
-    TLC59116_WriteLEDs(3, &buffer[0]);
-    TLC59116_On();
-    
-    LATB = 0x01;
-
-
-    
-    while(1) { }
         
 
    while(1) {
@@ -123,7 +110,7 @@ void UARTRecieve() {
 }
 
 void InitDriverI2C() {
-    I2C1_Init(400000);
+    I2C1_Init(900000);
 }
 
 void Alive() {
@@ -146,11 +133,11 @@ void SetDefaults() {
     auto_idle_counter = 0;
     auto_idle_enable = 1;
     auto_idle_flag = 0;
-    led_power_duration = 16000;
+    led_power_duration = 128000;
     buffer_swap = 1;
     buffer = buffer1;
     backbuffer = buffer2;
-    memset(buffer, 0x55, BUFFERSIZE);
+    memset(buffer, 0x00, BUFFERSIZE);
 }
 
 void Refresh() {
@@ -171,7 +158,7 @@ void Refresh() {
 void IdlePattern() {
     int i, d;
     
-    for(i = 0; i < 7; i++) {
+    for(i = 0; i < SIZE; i++) {
         LedOn(0, 0, i);
         LedOn(7, 0, i);
         LedOn(0, 7, i);

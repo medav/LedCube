@@ -46,7 +46,7 @@ typedef enum {
 } TLC59116RW;
 
 // Global default ALL CALL address for TLC59116
-static const byte TLC59116_ALLCALLADDR = 0xD0;
+static const byte TLC59116_ALLCALLADDR = 0x08;
 
 // Auto increment flags
 static const byte AUTOINC_NONE = 0x00;
