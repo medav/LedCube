@@ -18,7 +18,7 @@ namespace LedCube
         {
             sp = new SerialPort();
             sp.PortName = "/dev/ttyAMA0";
-            sp.BaudRate = 234000;
+            sp.BaudRate = 230400;
 
             sp.ReadTimeout = 500;
             sp.WriteTimeout = 500;

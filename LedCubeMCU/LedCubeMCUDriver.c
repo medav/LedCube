@@ -25,6 +25,8 @@ void main() {
    InitDriverI2C();
    //InitUART();
    Alive();
+   
+   Delay_us(1000);
 
    // Reset the Drivers
    TLC59116_ResetAll();
@@ -34,8 +36,8 @@ void main() {
    IdlePattern();
 
    // Enable all interrupts
-   //INTCON.GIE = 1;
-   //INTCON.PEIE = 1;
+   INTCON.GIE = 1;
+   INTCON.PEIE = 1;
         
 
    while(1) {
@@ -151,6 +153,7 @@ void Refresh() {
         LATB = 0x80 >> l;
         TLC59116_On();
         Delay_us(1000);
+        TLC59116_Off();
         LATB = 0x00;
     }
 }

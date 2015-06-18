@@ -19,6 +19,11 @@ void TLC59116_On() {
     TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x01);
 }
 
+void TLC59116_On() {
+    // Set Mode1 to 0x01 to turn on the Oscilator
+    TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x11);
+}
+
 void TLC59116_WriteReg(byte addr, byte reg, byte val) {
     I2C1_Start();
         I2C1_Wr(0xC0 | (addr << 1) | WRITE);

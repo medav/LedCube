@@ -58,6 +58,7 @@ static const byte AUTOINC_CONTROL = 0xC0;
 void TLC59116_ResetAll();
 void TLC59116_Setup();
 void TLC59116_On();
+void TLC59116_Off();
 void TLC59116_WriteReg(byte addr, byte reg, byte val);
 void TLC59116_WriteLEDs(byte addr, byte * val);
 
