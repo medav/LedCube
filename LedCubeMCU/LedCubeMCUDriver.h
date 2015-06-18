@@ -26,13 +26,13 @@ typedef enum {
 } CONTROLDATA;
 
 // Power duration for LEDs (us)
-static int led_power_duration = 300;
+int led_power_duration;
 
 // Auto idle enable
-static byte auto_idle_enable;
+byte auto_idle_enable;
 
 // Countdown to idle screen
-static int auto_idle_timeout;
+int auto_idle_timeout;
 // ===================================
 
 // ========= Internal Data ===========

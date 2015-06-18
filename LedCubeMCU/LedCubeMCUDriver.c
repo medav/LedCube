@@ -133,7 +133,7 @@ void SetDefaults() {
     auto_idle_counter = 0;
     auto_idle_enable = 1;
     auto_idle_flag = 0;
-    led_power_duration = 128000;
+    led_power_duration = 64000;
     buffer_swap = 1;
     buffer = buffer1;
     backbuffer = buffer2;
@@ -148,9 +148,9 @@ void Refresh() {
         TLC59116_WriteLEDs(2, &buffer[l * 16 + 8]);
         TLC59116_WriteLEDs(3, &buffer[l * 16 + 12]);
         
-        LATB = 0x01 << l;
+        LATB = 0x80 >> l;
         TLC59116_On();
-        Delay_Cyc(led_power_duration);
+        Delay_us(1000);
         LATB = 0x00;
     }
 }
@@ -174,7 +174,7 @@ void IdlePattern() {
         LedOn(i, 0, 7);
         LedOn(i, 7, 7);
         
-        for(d = 0; d < 5; d++) {
+        for(d = 0; d < 2; d++) {
             Refresh();
         }
     }
