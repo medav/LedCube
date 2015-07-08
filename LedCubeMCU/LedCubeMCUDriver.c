@@ -92,7 +92,7 @@ void InitUART() {
 
 void UARTRecieve() {
     byte recv = RCREG1;
-    TXREG1 = recv;
+    //TXREG1 = recv;
     switch(curcmd) {
     case IDLE:
         curcmd = recv;
@@ -137,7 +137,7 @@ void SetDefaults() {
     auto_idle_counter = 0;
     auto_idle_enable = 1;
     auto_idle_flag = 0;
-    led_power_duration = 64000;
+    led_power_duration = 96000;
     buffer_swap = 1;
     buffer = buffer1;
     backbuffer = buffer2;
