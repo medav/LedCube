@@ -19,7 +19,7 @@ void TLC59116_On() {
     TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x01);
 }
 
-void TLC59116_On() {
+void TLC59116_Off() {
     // Set Mode1 to 0x01 to turn on the Oscilator
     TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x11);
 }

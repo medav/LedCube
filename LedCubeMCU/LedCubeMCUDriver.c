@@ -2,11 +2,12 @@
 #include "LedCubeMCUDriver.h"
 
 void InterruptHandler() iv 0x0008 ics ICS_AUTO {
+
     if(RC1IF) {
-        LATD = 0x03;
         UARTRecieve();
     }
 }
+
 
 void main() {
    // Set OSC to 64 MHz
@@ -23,7 +24,7 @@ void main() {
 
    SetDefaults();
    InitDriverI2C();
-   //InitUART();
+   InitUART();
    Alive();
    
    Delay_us(1000);
@@ -75,10 +76,10 @@ void InitUART() {
     // SPBRGH1:SPBRG1 = 0x0010
     SPBRGH1 = 0;
     SPBRG1 = 16;
-    //UART1_Init(2000000);
 
     // Want Async operation
     TXSTA1.SYNC = 0;
+    TXSTA1.TXEN = 1;
 
     // Enable Interrupts
     PIE1.RC1IE = 1;
@@ -91,6 +92,7 @@ void InitUART() {
 
 void UARTRecieve() {
     byte recv = RCREG1;
+    TXREG1 = recv;
     switch(curcmd) {
     case IDLE:
         curcmd = recv;
@@ -112,7 +114,7 @@ void UARTRecieve() {
 }
 
 void InitDriverI2C() {
-    I2C1_Init(900000);
+    I2C1_Init(800000);
 }
 
 void Alive() {
@@ -153,13 +155,13 @@ void Refresh() {
         LATB = 0x80 >> l;
         TLC59116_On();
         Delay_us(1000);
-        TLC59116_Off();
         LATB = 0x00;
     }
 }
 
 void IdlePattern() {
     int i, d;
+    memset(buffer, 0x00, BUFFERSIZE);
     
     for(i = 0; i < SIZE; i++) {
         LedOn(0, 0, i);
@@ -193,6 +195,7 @@ void SwapBuffers() {
          backbuffer = buffer2;
     }
     
+    auto_idle_counter = 0;
     buffer_swap = 1 - buffer_swap;
 }
 

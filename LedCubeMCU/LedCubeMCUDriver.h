@@ -45,7 +45,7 @@ int buffer_counter;
 byte arg_buffer[64];
 int arg_counter;
 
-int auto_idle_counter;
+volatile int auto_idle_counter;
 byte auto_idle_flag;
 
 CUBECMD curcmd;
