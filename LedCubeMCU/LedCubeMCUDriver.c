@@ -4,6 +4,8 @@
 void InterruptHandler() iv 0x0008 ics ICS_AUTO {
 
     if(RC1IF) {
+        auto_idle_flag = 1;
+        auto_idle_counter = 0;
         UARTRecieve();
     }
 }

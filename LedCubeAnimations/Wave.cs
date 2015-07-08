@@ -22,6 +22,7 @@ namespace LedCube.Animations
                 PaintFrame();
                 t++;
                 cube.WriteBuffer();
+                System.Threading.Thread.Sleep(10);
             }
         }
         
