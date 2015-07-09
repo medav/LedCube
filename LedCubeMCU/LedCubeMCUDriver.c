@@ -4,9 +4,9 @@
 void InterruptHandler() iv 0x0008 ics ICS_AUTO {
 
     if(RC1IF) {
+        UARTRecieve();
         auto_idle_flag = 1;
         auto_idle_counter = 0;
-        UARTRecieve();
     }
 }
 
@@ -47,8 +47,8 @@ void main() {
       Refresh();
       auto_idle_counter++;
 
-      if(auto_idle_counter > auto_idle_timeout && auto_idle_enable && auto_idle_flag) {
-         IdlePattern();
+      if((auto_idle_counter > auto_idle_timeout) && auto_idle_enable && auto_idle_flag) {
+         //IdlePattern();
          auto_idle_counter = 0;
          auto_idle_flag = 0;
       }
@@ -66,6 +66,8 @@ void DispatchCmd() {
     default:
         break;
     }
+    
+    curcmd = IDLE;
 }
 
 void InitUART() {
@@ -96,7 +98,7 @@ void UARTRecieve() {
     byte recv = RCREG1;
     //TXREG1 = recv;
     switch(curcmd) {
-    case IDLE:
+    case NOOP:
         curcmd = recv;
         buffer_counter = 0;
         arg_counter = 0;
@@ -110,7 +112,7 @@ void UARTRecieve() {
     case ENDCMD:
         DispatchCmd();
     default:
-        curcmd = IDLE;
+        curcmd = NOOP;
         break;
     }
 }
@@ -196,8 +198,7 @@ void SwapBuffers() {
          buffer = buffer1;
          backbuffer = buffer2;
     }
-    
-    auto_idle_counter = 0;
+
     buffer_swap = 1 - buffer_swap;
 }
 
@@ -207,10 +208,10 @@ void SetVar(CONTROLDATA var, int val) {
         led_power_duration = val;
         break;
     case V_AUTO_IDLE_ENABLE:
-        auto_idle_enable = val;
+//        auto_idle_enable = val;
         break;
     case V_AUTO_IDLE_TIMEOUT:
-        auto_idle_timeout = val;
+//        auto_idle_timeout = val;
         break;
     default:
         break;

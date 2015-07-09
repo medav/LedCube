@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LedCube
 {
@@ -8,7 +10,10 @@ namespace LedCube
         #region Member Variables
         // Serial port for connecting with PIC via UART
         private SerialPort sp;
-        
+
+        private Task ReadTask;
+        private CancellationTokenSource cts;
+
         // Internal buffer to be used for communication
         private byte[] buffer = new byte[130];
         #endregion
@@ -23,11 +28,29 @@ namespace LedCube
             sp.ReadTimeout = 500;
             sp.WriteTimeout = 500;
 
+            ReadTask = Task.Run(() =>
+            {
+                ReadData();
+            }, cts.Token);
+
             buffer[0] = 0x80;
             buffer[129] = 0xFF;
 
             sp.Open();
         }
+        #endregion
+
+        #region Receiver
+
+        public void ReadData()
+        {
+            while(true)
+            {
+                int recv = sp.ReadByte();
+                Console.Out.Write((char)recv);
+            }
+        }
+
         #endregion
 
         #region Base LED Controls

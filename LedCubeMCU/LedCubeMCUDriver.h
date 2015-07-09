@@ -32,7 +32,7 @@ int led_power_duration;
 byte auto_idle_enable;
 
 // Countdown to idle screen
-int auto_idle_timeout;
+volatile int auto_idle_timeout;
 // ===================================
 
 // ========= Internal Data ===========
@@ -46,7 +46,7 @@ byte arg_buffer[64];
 int arg_counter;
 
 volatile int auto_idle_counter;
-byte auto_idle_flag;
+volatile byte auto_idle_flag;
 
 CUBECMD curcmd;
 byte args[16];
