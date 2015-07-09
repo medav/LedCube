@@ -45,7 +45,7 @@ namespace LedCube
             while(true)
             {
                 int recv = sp.ReadByte();
-                Console.Out.Write((char)recv);
+                Console.Out.Write(recv.ToString("X2")  + ", ");
             }
         }
 
