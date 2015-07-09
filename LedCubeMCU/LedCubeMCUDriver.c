@@ -138,7 +138,7 @@ void Alive() {
 
 void SetDefaults() {
     curcmd = 0;
-    auto_idle_timeout = 1000;
+    auto_idle_timeout = 4000;
     auto_idle_counter = 0;
     auto_idle_enable = 1;
     auto_idle_flag = 0;
