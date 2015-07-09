@@ -28,10 +28,8 @@ namespace LedCube
             sp.ReadTimeout = 500;
             sp.WriteTimeout = 500;
 
-            ReadTask = Task.Run(() =>
-            {
-                ReadData();
-            }, cts.Token);
+            cts = new CancellationTokenSource();
+            ReadTask = Task.Run(new Action(ReadData), cts.Token);
 
             buffer[0] = 0x80;
             buffer[129] = 0xFF;
