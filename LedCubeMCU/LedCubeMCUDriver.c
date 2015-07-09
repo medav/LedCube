@@ -10,7 +10,6 @@ void InterruptHandler() iv 0x0008 ics ICS_AUTO {
     }
 }
 
-
 void main() {
    // Set OSC to 64 MHz
    OSCCON = 0xF4;
@@ -48,7 +47,7 @@ void main() {
       auto_idle_counter++;
 
       if((auto_idle_counter > auto_idle_timeout) && auto_idle_enable && auto_idle_flag) {
-         //IdlePattern();
+         IdlePattern();
          auto_idle_counter = 0;
          auto_idle_flag = 0;
       }
@@ -66,8 +65,6 @@ void DispatchCmd() {
     default:
         break;
     }
-    
-    curcmd = IDLE;
 }
 
 void InitUART() {
@@ -96,7 +93,13 @@ void InitUART() {
 
 void UARTRecieve() {
     byte recv = RCREG1;
-    //TXREG1 = recv;
+    
+    if(recv == ENDCMD) {
+        DispatchCmd();
+        curcmd = NOOP;
+        return;
+    }
+
     switch(curcmd) {
     case NOOP:
         curcmd = recv;
@@ -109,8 +112,6 @@ void UARTRecieve() {
     case SETCONTROL:
         arg_buffer[arg_counter++] = recv;
         break;
-    case ENDCMD:
-        DispatchCmd();
     default:
         curcmd = NOOP;
         break;
@@ -137,11 +138,11 @@ void Alive() {
 
 void SetDefaults() {
     curcmd = 0;
-    auto_idle_timeout = 10000;
+    auto_idle_timeout = 1000;
     auto_idle_counter = 0;
     auto_idle_enable = 1;
     auto_idle_flag = 0;
-    led_power_duration = 96000;
+    led_power_duration = 32000;
     buffer_swap = 1;
     buffer = buffer1;
     backbuffer = buffer2;
@@ -208,10 +209,10 @@ void SetVar(CONTROLDATA var, int val) {
         led_power_duration = val;
         break;
     case V_AUTO_IDLE_ENABLE:
-//        auto_idle_enable = val;
+        auto_idle_enable = val;
         break;
     case V_AUTO_IDLE_TIMEOUT:
-//        auto_idle_timeout = val;
+        auto_idle_timeout = val;
         break;
     default:
         break;
