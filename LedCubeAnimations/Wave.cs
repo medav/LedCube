@@ -35,7 +35,7 @@ namespace LedCube.Animations
             {
                 for (y = 0; y < 8; y++)
                 {
-                    z = (byte) Math.Round(3.5 + 3.5 * Math.Sin(x / 4.0 + y / 4.0 + t / 32.0));
+                    z = (byte) Math.Round(3.5 + 3.5 * Math.Sin(x / 4.0 + y / 4.0 + t / 24.0));
                     cube.LedOn(x, y, z);
                 }
             }
