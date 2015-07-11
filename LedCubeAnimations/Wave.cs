@@ -7,12 +7,7 @@ namespace LedCube.Animations
     {
         int t;
 
-        public Wave() : base() { }
-
-        override protected void Setup()
-        {
-            t = 0;
-        }
+        public Wave() : base() { t = 0; }
 
         override protected void Run()
         {
