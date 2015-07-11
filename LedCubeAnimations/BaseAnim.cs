@@ -25,7 +25,6 @@ namespace LedCube.Animations
         #region Animation Control
         public void Start()
         {
-            Setup();
             anim.Start();
         }
 
@@ -42,12 +41,6 @@ namespace LedCube.Animations
 
         #region Animation Specific
         // These are to be implemented by derived animations
-
-        // Setup is called once before the animation begins
-        virtual protected void Setup()
-        {
-
-        }
         
         // Run is called in a separate thread. It is assumed
         // that this runs an infinite loop
