@@ -1,0 +1,3 @@
+[submodule "CubeSim"]
+	path = CubeSim
+	url = https://github.com/QuantumFractal/CubeSim.git
