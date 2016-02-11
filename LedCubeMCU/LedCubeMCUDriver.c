@@ -4,9 +4,9 @@
 void InterruptHandler() iv 0x0008 ics ICS_AUTO {
 
     if(RC1IF) {
-        UARTRecieve();
         auto_idle_flag = 1;
         auto_idle_counter = 0;
+        UARTRecieve();
     }
 }
 
@@ -95,8 +95,10 @@ void UARTRecieve() {
     byte recv = RCREG1;
     
     if(recv == ENDCMD) {
-        DispatchCmd();
-        curcmd = NOOP;
+        if(curcmd != NOOP) {
+            DispatchCmd();
+            curcmd = NOOP;
+        }
         return;
     }
 
@@ -107,10 +109,12 @@ void UARTRecieve() {
         arg_counter = 0;
         break;
     case READFRAME:
-        buffer[buffer_counter++] = recv;
+        if(buffer_counter < 127)
+            buffer[buffer_counter++] = recv;
         break;
     case SETCONTROL:
-        arg_buffer[arg_counter++] = recv;
+        if(arg_counter < 63)
+            arg_buffer[arg_counter++] = recv;
         break;
     default:
         curcmd = NOOP;
@@ -142,11 +146,17 @@ void SetDefaults() {
     auto_idle_counter = 0;
     auto_idle_enable = 1;
     auto_idle_flag = 0;
-    led_power_duration = 32000;
-    buffer_swap = 1;
+    led_power_duration = 20;
     buffer = buffer1;
     backbuffer = buffer2;
     memset(buffer, 0x00, BUFFERSIZE);
+}
+
+void Delay_50us(int times) {
+    int i;
+    for(i = 0; i < times; i++) {
+        Delay_50us();
+    }
 }
 
 void Refresh() {
@@ -159,7 +169,7 @@ void Refresh() {
         
         LATB = 0x80 >> l;
         TLC59116_On();
-        Delay_us(1000);
+        Delay_Cyc(led_power_duration);
         LATB = 0x00;
     }
 }
@@ -191,16 +201,9 @@ void IdlePattern() {
 }
 
 void SwapBuffers() {
-    if(buffer_swap) {
-        buffer = buffer2;
-        backbuffer = buffer1;
-    }
-    else {
-         buffer = buffer1;
-         backbuffer = buffer2;
-    }
-
-    buffer_swap = 1 - buffer_swap;
+    byte * temp = buffer;
+    buffer = backbuffer;
+    backbuffer = temp;
 }
 
 void SetVar(CONTROLDATA var, int val) {

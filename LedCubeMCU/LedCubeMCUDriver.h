@@ -9,7 +9,7 @@
 // Enum for commands
 typedef enum {
     NOOP,
-    READFRAME = 0x80,
+    READFRAME = 0x91,
     SETCONTROL,
     IDLE,
     CLEAR = 0xEE,
@@ -25,8 +25,8 @@ typedef enum {
     V_AUTO_IDLE_TIMEOUT
 } CONTROLDATA;
 
-// Power duration for LEDs (us)
-int led_power_duration;
+// Power duration for LEDs (0.05 ms)
+byte led_power_duration;
 
 // Auto idle enable
 byte auto_idle_enable;
@@ -39,7 +39,6 @@ volatile int auto_idle_timeout;
 byte buffer1[BUFFERSIZE];
 byte buffer2[BUFFERSIZE];
 byte * buffer, * backbuffer;
-byte buffer_swap;
 int buffer_counter;
 
 byte arg_buffer[64];
