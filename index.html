@@ -99,25 +99,96 @@
 <h3>
 <a id="display-drivers-1" class="anchor" href="#display-drivers-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display Drivers</h3>
 
+<p>I paired off the drivers and soldered them onto small breadboards.</p>
+
+<p>Coming soon: Board schematics for the drivers.</p>
+
 <h3>
 <a id="layer-switches" class="anchor" href="#layer-switches" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Layer Switches</h3>
+
+<p>The layer switches served as a way for the PIC's 3.3V logic to control a high current 12V line. Below is a diagram of the switches.</p>
+
+<p><img src="https://bvtisq-bn1305.files.1drv.com/y3m2y_T8H6Q2uTNNXhNIzrf9KulXWN6ad0k53UnVj-M7YRBfa_vn2qOhEOik6aeoGAXnHqrJYCY6ctogLOnS1ZRpB83Oo2GhBvoaHdwcxbAjlrF1X-qoVagWLPyLjDiHlKkY2pNilS9uJ8eP1zPU5FIUsHxq-s25QBsMAhClIKa7co?width=623&amp;height=1018&amp;cropmode=none" alt="Layer switch diagram">
+<em>Circuit diagram of switches (Note: only 4 are depicted here, there are 8 total).</em></p>
+
+<p>The 8 input pins are connected to PORT B on the PIC. The PIC writes a single bit to the port to power on the layer.</p>
+
+<p><img src="https://bvtjsq-bn1305.files.1drv.com/y3mAE36_-l6kzFkRiEVbW220uX3xGIhNKFyCvnB7Da9enbof_rdIcpNSz4OoVZ2svpYtHXv-06m0R8T_0mjdzBIb-vCSv1x-RHg_4-CvGs2OPGFNLRB-7Kl3_4dpQkN9ZyC2eXOUljKx8XGCNvBRZ3bxA?width=967&amp;height=1024&amp;cropmode=none" alt="Finished layer switches"></p>
 
 <h3>
 <a id="power-supply" class="anchor" href="#power-supply" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Power Supply</h3>
 
+<p>This section isn't finished yet!</p>
+
 <h3>
 <a id="putting-it-together" class="anchor" href="#putting-it-together" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Putting it together</h3>
+
+<p>Neither is this one!</p>
 
 <hr>
 
 <h2>
 <a id="software" class="anchor" href="#software" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Software</h2>
 
+<p>The software used to control the cube comes in to parts. The first is the embedded C code on the PIC. </p>
+
 <h3>
 <a id="display-controller-1" class="anchor" href="#display-controller-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display Controller</h3>
 
+<p>The code on the PIC acts as a double buffered display driver, allowing outside sources to pipe in frames over UART. It manages the drivers, taking care of setting up the correct internal register values, and also includes a auto-idle animation (I.e. a screen saver) and software configurable internal registers for directing the operation of the display cycle.</p>
+
+<p>The files related to the PIC code are in ledcube/LedCubeMCU/. It is a MikroElektronika C for PIC project and can only be compiled and loaded as is with the MikroE compiler and programmer.</p>
+
+<h3>
+<a id="commandresponse-protocol-over-uart" class="anchor" href="#commandresponse-protocol-over-uart" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Command/Response Protocol over UART</h3>
+
+<p>In the PIC code, in LedCubeMCUDriver.h, you will find the following lines,</p>
+
+<div class="highlight highlight-source-c"><pre><span class="pl-c">// Enum for commands</span>
+<span class="pl-k">typedef</span> <span class="pl-k">enum</span> {
+    NOOP,
+    READFRAME = 0x91,
+    SETCONTROL,
+    IDLE,
+    CLEAR = 0xEE,
+    ENDCMD = 0xFF
+} CUBECMD;</pre></div>
+
+<p>These are arbitrarily defined, but my intent was that the usable commands would satisfy the following constraints:</p>
+
+<ul>
+<li>Of the pairs of bits in a byte, at least one bit in the left position is set (I.e. 0b10101010 &amp; CMD != 0x00). The reason is to not confuse commands with writing LED values, which are in the form of (0b01010101).</li>
+<li>Should not be easy to mistakenly send over the line. Initially, when the Raspberry Pi boots, some garbage data can be sent over the UART accidentally (I.e. the line may drop to zero for an instant). This ensures that a READFRAME isn't started unless intended.</li>
+</ul>
+
+<p>The PIC command system acts as a state machine. Here is a quick diagram:
+<img src="https://qfqopa-bn1305.files.1drv.com/y3m8afrfNmjBMfrH6HJBqYE95Ds7YAtARSovfkdWq_JgZT-1BVLTQDOwdFBf5e6bokI0ivNYg8nCrkBt759VT2r809zmrlSmN2309RrQCgmHSClL9nA1f6gJe3Gd6Apv1zbhuiFySwEapLU-FfI_8wV7puF3omnmoRvacAWCKJDxkE?width=1805&amp;height=1033&amp;cropmode=none" alt="Command FSM">
+<em>State machine for command processing</em></p>
+
+<p>The PIC will sit in IDLE until a byte is sent to it containing the command to start. If it is a READFRAME command, the PIC will enter the "Read to Buffer" state. This directs all further input to the back-buffer. Upon ENDCMD, the back-buffer will be swapped with the display buffer updating the frame instantly. For referance, a frame would be sent in the following format:</p>
+
+<pre><code>READFRAME, &lt;FRAME PAYLOAD&gt;, ENDCMD
+</code></pre>
+
+<p>If you wanted to send a frame setting all LEDs ON, it looks like:</p>
+
+<pre><code>9155...55FF
+</code></pre>
+
+<p>Where 0x55 is repeated 128 times.</p>
+
+<p>Upon receiving any other command, the PIC will enter the "Read Args" state, which will read one byte at a time into an argument buffer until ENDCMD is received. A different buffer is used for this because the back-buffer is only for LED data and when swapped into the display, cannot contain any garbage from left over commands.</p>
+
+<p>There is no error checking / correction done on the command system because throughput is important. As it stands, the interface is capable of about 66 FPS from the Pi to the display. Any sort of checking would only serve to add delay in reading a frame and reduce performance.</p>
+
 <h3>
 <a id="raspberry-pi-1" class="anchor" href="#raspberry-pi-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Raspberry Pi</h3>
+
+<p>The code for the Raspberry Pi is actually quite simple. Now that we have the PIC set up to manage the display, we can pipe frames to it over the Pi's UART asynchronously. In PyLedCube/LedCubePy, there is a Python module which serves as an interface. It simply opens the Pi's UART (/dev/ttyAMA0), and converts (x, y, z) coordinates into their corresponding bits in the buffer. When WriteBuffer() is called, it dumps the frame to the PIC to be displayed. </p>
+
+<p>Support for modifying the PIC's internal variables through SETCONTROL is not supported yet. In the future, it will be possible to modify existing and future variables on the PIC through the Python interface.</p>
+
+<p>There also is a C# based interface written to work with Mono on the Pi. In the future I plan to evaluate using Windows 10 IoT core on the Pi, which would require this interface. </p>
 
 <hr>
 
