@@ -74,15 +74,27 @@
 <h3>
 <a id="raspberry-pi" class="anchor" href="#raspberry-pi" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Raspberry Pi</h3>
 
-<p>To give the cube the capability of almost anything, I used a Raspberry Pi as a master controller for the system. I run simple Raspian Linux on the Pi, and have developed a software API in Mono C# that abstracts away the underlying hardware interface and provides end users to easy address LEDs in a simple (x, y, z) format. The end result is a top level system that is capable of eveytrhing from simple animations to accepting network input and more!</p>
+<p>To give the cube the capability of almost anything, I used a Raspberry Pi as a master controller for the system. I run simple Raspian Linux on the Pi, and have developed a software API in Mono C# that abstracts away the underlying hardware interface and provides end users to easy address LEDs in a simple (x, y, z) format. The end result is a top level system that is capable of everything from simple animations to accepting network input and more!</p>
 
 <hr>
 
 <h2>
 <a id="construction" class="anchor" href="#construction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Construction</h2>
 
+<p>Constructing the cube was done in parts. The hardest is the array itself.</p>
+
 <h3>
 <a id="led-array" class="anchor" href="#led-array" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LED Array</h3>
+
+<p>The array was built in layers of 8x8 LEDs. I found an old block of wood and used a drill press to place 5mm holes in a grid of 8x8, exactly 2cm (center to center) apart. I then placed the LEDs into the template and bent the cathodes down and soldered them together.</p>
+
+<p><img src="https://bfuiva-bn1305.files.1drv.com/y3m5IwR9HmbWNapaksOPUAZqUnFSD8sD88ZX-i4P109g_KOkuC0Q0_4Qtz76dakMoIDR8Gayy0wg69jBMbYc9OncF643oBKE3Qzd8aI7oBGpOG-7y1UhDaTgU1prEem-y4lXwLXuQLhIRWmr6VNGWqf4w?width=1024&amp;height=579&amp;cropmode=none" alt="Block template">
+<em>Block template and LED layers being soldered together</em></p>
+
+<p>Each layer was made first, then they were put together. I used Lego parts as scaffolding to hold the layers in place while I soldered them.</p>
+
+<p><img src="https://bfvt3w-bn1305.files.1drv.com/y3m3inepA4h2H0izW5T3mJEeWWbuRgA5gVzrLZG0U654f7t0FRHZgOiWkb26QYC8Sy77llMdn5sXuCmK0tgA12XI83gjiSEiLFWKX-BPCGOtzJo6dM_l1THb02m80rgBo6-CX2fxbXZkrOmrBFqWoXENA?width=807&amp;height=1024&amp;cropmode=none" alt="Finished Array">
+<em>The finished array (Upside down, in the wood template)</em></p>
 
 <h3>
 <a id="display-drivers-1" class="anchor" href="#display-drivers-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display Drivers</h3>
