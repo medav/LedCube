@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Led Cube Project by medav</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Led Cube Project</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/medav/ledcube" class="btn">View on GitHub</a>
+      <a href="https://github.com/medav/ledcube/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/medav/ledcube/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="8x8x8-led-cube-project" class="anchor" href="#8x8x8-led-cube-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>8x8x8 LED Cube Project</h2>
+
+<p>Over the last year and a half, I designed, constructed and programmed an 8x8x8 LED Cube. This page serves as a complete description of my design and how I was able to make it all work. The goal of this page is to provide enough information so that a beginner in hardware and software could build their own cube. </p>
+
+<p>Ready to get started? Read on!</p>
+
+<hr>
+
+<h2>
+<a id="materials" class="anchor" href="#materials" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Materials</h2>
+
+<ul>
+<li>512 x 5mm diffused LEDs (Any color) </li>
+<li>4 x TLC59116 Constant current sink LED drivers </li>
+<li>1 x PIC18LF45K22 MCU</li>
+<li>8 x 2n4401 NPN type transistors</li>
+<li>8 x FQD11P06 P-Channel MOSFETs</li>
+<li>1 x LM350 voltage regulator</li>
+<li>Breadboards to put it on</li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="high-level-design" class="anchor" href="#high-level-design" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>High Level Design</h2>
+
+<p>The overall design is works be performing a raster scan from the top down on a 3D array of LEDs. The array is designed such that each of 8 8x8 layers are addressed one at a time. 4 constant current display drivers capable of addressing 16 LEDs each. A PIC MCU is used to coordinate the refresh cycles by writing to the drivers appropriately. Finally, a Raspberry Pi is used as an interface and frame rendering system that is capable of communicating frames to the PIC.</p>
+
+<h3>
+<a id="512-led-array" class="anchor" href="#512-led-array" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>512 LED Array</h3>
+
+<p>The whole array is broken into 8 layers of 64 LEDs Each. The cathodes of all the LEDs in a layer are soldered together allowing the whole layer to be powered at one time. The anodes of the LEDs form the columns of the array. Each layer then has 1 power input, and 64 addressable columns, allowing the driver to address 64 columns with the 4 display drivers.</p>
+
+<h3>
+<a id="display-drivers" class="anchor" href="#display-drivers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display Drivers</h3>
+
+<p>4 Texas Instruments TLC59116 16-bit I2C LED Sink Drivers are used to address a layer of 8x8 (64) LEDs. These drivers can read in data for one layer of LEDs and latch the output so that the layer can be displayed.</p>
+
+<h3>
+<a id="display-controller" class="anchor" href="#display-controller" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display controller</h3>
+
+<p>The display controller was a PIC18LF45K22 PIC Microcontroller programmed with a Mikro Electronika EasyProg. The driver was written in embedded C to act as a double buffered system capable of accepting asynchronous input through UART connection with a master controller while keeping the display refreshed.</p>
+
+<h3>
+<a id="raspberry-pi" class="anchor" href="#raspberry-pi" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Raspberry Pi</h3>
+
+<p>To give the cube the capability of almost anything, I used a Raspberry Pi as a master controller for the system. I run simple Raspian Linux on the Pi, and have developed a software API in Mono C# that abstracts away the underlying hardware interface and provides end users to easy address LEDs in a simple (x, y, z) format. The end result is a top level system that is capable of eveytrhing from simple animations to accepting network input and more!</p>
+
+<hr>
+
+<h2>
+<a id="construction" class="anchor" href="#construction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Construction</h2>
+
+<h3>
+<a id="led-array" class="anchor" href="#led-array" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LED Array</h3>
+
+<h3>
+<a id="display-drivers-1" class="anchor" href="#display-drivers-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display Drivers</h3>
+
+<h3>
+<a id="layer-switches" class="anchor" href="#layer-switches" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Layer Switches</h3>
+
+<h3>
+<a id="power-supply" class="anchor" href="#power-supply" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Power Supply</h3>
+
+<h3>
+<a id="putting-it-together" class="anchor" href="#putting-it-together" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Putting it together</h3>
+
+<hr>
+
+<h2>
+<a id="software" class="anchor" href="#software" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Software</h2>
+
+<h3>
+<a id="display-controller-1" class="anchor" href="#display-controller-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display Controller</h3>
+
+<h3>
+<a id="raspberry-pi-1" class="anchor" href="#raspberry-pi-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Raspberry Pi</h3>
+
+<hr>
+
+<h2>
+<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h2>
+
+<p>Michael Davies</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/medav/ledcube">Led Cube Project</a> is maintained by <a href="https://github.com/medav">medav</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
