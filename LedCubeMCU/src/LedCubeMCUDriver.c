@@ -11,47 +11,52 @@ void InterruptHandler() iv 0x0008 ics ICS_AUTO {
 }
 
 void main() {
-   // Set OSC to 64 MHz
-   OSCCON = 0xF4;
-   OSCCON2 = 0x80;
-   OSCTUNE = 0xFF;
+    // Set OSC to 64 MHz
+    IRCF2_bit = 1;
+    IRCF1_bit = 1;
+    IRCF0_bit = 1;
 
-   // Setup output pins
-   ANSELC = 0;
-   TRISB = 0x00;
-   TRISD = 0x00;
-   LATB = 0x00;
-   
+    INTSRC_bit = 1;
+    PLLEN_bit = 1;
 
-   SetDefaults();
-   InitDriverI2C();
-   InitUART();
-   Alive();
-   
-   Delay_us(1000);
+    // Setup output pins
+    ANSELC = 0;
+    TRISB = 0x00;
+    TRISD = 0x00;
+    LATB = 0x00;
 
-   // Reset the Drivers
-   TLC59116_ResetAll();
-   TLC59116_Setup();
+    // Setup default variable values
+    // and communications
+    SetDefaults();
+    InitDriverI2C();
+    InitUART();
 
-   // Run Idle Pattern before allowing input
-   IdlePattern();
+    // Delay 1 second in case the power cable is
+    // still being plugged in
+    Delay_1sec();
 
-   // Enable all interrupts
-   INTCON.GIE = 1;
-   INTCON.PEIE = 1;
-        
+    // Reset the Drivers
+    TLC59116_ResetAll();
+    TLC59116_Setup();
 
-   while(1) {
-      Refresh();
-      auto_idle_counter++;
+    // Run Idle Pattern before allowing input
+    IdlePattern();
 
-      if((auto_idle_counter > auto_idle_timeout) && auto_idle_enable && auto_idle_flag) {
-         IdlePattern();
-         auto_idle_counter = 0;
-         auto_idle_flag = 0;
-      }
-   }
+    // Enable all interrupts
+    INTCON.GIE = 1;
+    INTCON.PEIE = 1;
+
+
+    while(1) {
+        Refresh();
+        auto_idle_counter++;
+
+        if((auto_idle_counter > auto_idle_timeout) && auto_idle_enable && auto_idle_flag) {
+            IdlePattern();
+            auto_idle_counter = 0;
+            auto_idle_flag = 0;
+        }
+    }
 }
 
 void DispatchCmd() {
@@ -68,7 +73,7 @@ void DispatchCmd() {
 }
 
 void InitUART() {
-    // 234 kBaud
+    // 230.4 kBaud
     // Multiplier on
     TXSTA1.BRGH = 1;
     
@@ -134,6 +139,8 @@ void Alive() {
         LATD = 0x03;
         Delay_100ms();
         LATD = 0x00;
+        
+        TXREG1 = 65;
     }
 
     Delay_100ms();
@@ -146,31 +153,26 @@ void SetDefaults() {
     auto_idle_counter = 0;
     auto_idle_enable = 1;
     auto_idle_flag = 0;
-    led_power_duration = 20;
+    led_power_duration = 1000;
     buffer = buffer1;
     backbuffer = buffer2;
     memset(buffer, 0x00, BUFFERSIZE);
 }
 
-void Delay_50us(int times) {
-    int i;
-    for(i = 0; i < times; i++) {
-        Delay_50us();
-    }
-}
-
 void Refresh() {
-    int l;
+    int l, i;
     for(l = 0; l < SIZE; l++) {
         TLC59116_WriteLEDs(0, &buffer[l * 16 + 0]);
         TLC59116_WriteLEDs(1, &buffer[l * 16 + 4]);
         TLC59116_WriteLEDs(2, &buffer[l * 16 + 8]);
         TLC59116_WriteLEDs(3, &buffer[l * 16 + 12]);
-        
+
         LATB = 0x80 >> l;
-        TLC59116_On();
-        Delay_Cyc(led_power_duration);
+          TLC59116_On();
+          for(i = 0; i < led_power_duration; i++);
+
         LATB = 0x00;
+
     }
 }
 

@@ -1,8 +1,18 @@
 #ifndef TLC59116
 #define TLC59116
 
+#define TLC_DEBUG
+
 // Typedef for 'byte' data
 typedef unsigned char byte;
+
+#ifdef TLC_DEBUG
+#define CHECKI2C(val) \
+        if((val) != 0) TX1REG = 'E'; \
+        Delay_1us();
+#else
+#define CHECKI2C(val) (val) ; Delay_1us();
+#endif
 
 // Enum for register addresses on TLC59116
 typedef enum {

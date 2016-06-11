@@ -26,7 +26,7 @@ typedef enum {
 } CONTROLDATA;
 
 // Power duration for LEDs (0.05 ms)
-byte led_power_duration;
+int led_power_duration;
 
 // Auto idle enable
 byte auto_idle_enable;
