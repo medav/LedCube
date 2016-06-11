@@ -6,6 +6,12 @@
 *.bmk
 *.brk
 *.dct
+*.hex
+
+# VS Code stuff
+.vscode/*
+*/.vscode/*
+
 
 # User-specific files
 *.suo
