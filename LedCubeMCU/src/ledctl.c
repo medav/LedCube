@@ -1,4 +1,10 @@
 #include "lcm.h"
+#include "tlc59116.h"
+
+int led_power_duration;
+byte buffer1[BUFFERSIZE];
+byte buffer2[BUFFERSIZE];
+byte * buffer, * backbuffer;
 
 void Refresh() {
     int l, i;

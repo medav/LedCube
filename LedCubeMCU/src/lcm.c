@@ -1,6 +1,11 @@
 #include "tlc59116.h"
 #include "lcm.h"
 
+byte auto_idle_enable;
+volatile int auto_idle_timeout;
+volatile int auto_idle_counter;
+volatile byte auto_idle_flag;
+
 void InterruptHandler() iv 0x0008 ics ICS_AUTO {
 
     if(RC1IF) {

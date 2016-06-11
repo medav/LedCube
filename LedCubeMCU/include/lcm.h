@@ -37,40 +37,37 @@ typedef enum {
 } CONTROLDATA;
 
 typedef unsigned char byte;
-typedef byte bool;
 
 // ===============================================
 
 // ============ Adjustable Variables =============
 
 // Power duration for LEDs (Expressed in number of
-// for loop iterations. Default is 1000)
-int led_power_duration;
+// for loop iterations. Default is 1000).
+// Defined in ledctl.c
+extern int led_power_duration;
 
-// Auto idle enable
-bool auto_idle_enable;
+// Enable or disable idle screen (Default is TRUE)
+// Defined in lcm.c
+extern byte auto_idle_enable;
 
-// Countdown to idle screen
-volatile int auto_idle_timeout;
+// Number of refresh cycles to perform until idle
+// screen is displayed.
+// Defined in lcm.c
+extern volatile int auto_idle_timeout;
 // ===============================================
 
-// ================ Internal Data ================
-byte buffer1[BUFFERSIZE];
-byte buffer2[BUFFERSIZE];
-byte * buffer, * backbuffer;
-int buffer_counter;
+// ============== LCM Internal Data ==============
+// ledctl.c
+extern byte buffer1[BUFFERSIZE];
+extern byte buffer2[BUFFERSIZE];
+extern byte * buffer, * backbuffer;
 
-byte arg_buffer[ARGBUFFERSIZE];
-int arg_counter;
-
-byte tx_buffer[TXBUFFERSIZE];
-int tx_counter;
-bool tx_active;
-
-volatile int auto_idle_counter;
-volatile bool auto_idle_flag;
-
-CUBECMD curcmd;
+// comm.c
+extern byte arg_buffer[ARGBUFFERSIZE];
+extern byte tx_buffer[TXBUFFERSIZE];
+extern byte tx_active;
+extern CUBECMD curcmd;
 // ===============================================
 
 // ============= Function Prototypes =============

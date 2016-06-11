@@ -1,5 +1,15 @@
 #include "lcm.h"
 
+int buffer_counter;
+
+byte arg_buffer[ARGBUFFERSIZE];
+int arg_counter;
+
+byte tx_buffer[TXBUFFERSIZE];
+int tx_counter;
+byte tx_active;
+
+CUBECMD curcmd;
 
 void InitUART() {
     // 230.4 kBaud
@@ -29,7 +39,7 @@ void InitUART() {
 
 }
 
-bool StartTx() {
+byte StartTx() {
     if(tx_active != FALSE) return FALSE;
 
     tx_counter = 0;

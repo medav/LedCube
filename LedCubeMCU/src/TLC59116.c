@@ -27,7 +27,7 @@ void TLC59116_Off() {
     TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x11);
 }
 
-void TLC59116_WriteReg(byte addr, byte reg, byte val) {
+void TLC59116_WriteReg(byte addr, TLC59116REG reg, byte val) {
     CHECKI2C(I2C1_Start());
         CHECKI2C(I2C1_Wr(0xC0 | (addr << 1) | WRITE));
         CHECKI2C(I2C1_Wr(AUTOINC_ALL | reg));

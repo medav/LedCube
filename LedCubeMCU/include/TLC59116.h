@@ -1,17 +1,25 @@
 #ifndef TLC59116
 #define TLC59116
 
-#define TLC_DEBUG
+#include "lcm.h"
 
-// Typedef for 'byte' data
-typedef unsigned char byte;
+//#define TLC_DEBUG
+
+// Global default ALL CALL address for TLC59116
+#define TLC59116_ALLCALLADDR 0x08
+
+// Auto increment flags
+#define AUTOINC_NONE 0x00
+#define AUTOINC_ALL 0x80
+#define AUTOINC_BRIGHTNESS 0xA0
+#define AUTOINC_CONTROL 0xC0
 
 #ifdef TLC_DEBUG
 #define CHECKI2C(val) \
         if((val) != 0) TX1REG = 'E'; \
         Delay_1us();
 #else
-#define CHECKI2C(val) (val) ; Delay_1us();
+#define CHECKI2C(val) { (val); }
 #endif
 
 // Enum for register addresses on TLC59116
@@ -55,21 +63,12 @@ typedef enum {
     READ,
 } TLC59116RW;
 
-// Global default ALL CALL address for TLC59116
-static const byte TLC59116_ALLCALLADDR = 0x08;
-
-// Auto increment flags
-static const byte AUTOINC_NONE = 0x00;
-static const byte AUTOINC_ALL = 0x80;
-static const byte AUTOINC_BRIGHTNESS = 0xA0;
-static const byte AUTOINC_CONTROL = 0xC0;
-
 // Interface operations
 void TLC59116_ResetAll();
 void TLC59116_Setup();
 void TLC59116_On();
 void TLC59116_Off();
-void TLC59116_WriteReg(byte addr, byte reg, byte val);
+void TLC59116_WriteReg(byte addr, TLC59116REG reg, byte val);
 void TLC59116_WriteLEDs(byte addr, byte * val);
 
 #endif
