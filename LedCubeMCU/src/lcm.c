@@ -13,6 +13,9 @@ void InterruptHandler() iv 0x0008 ics ICS_AUTO {
         auto_idle_counter = 0;
         UARTRecieve();
     }
+    else if(TX1IF) {
+        UARTSend();
+    }
 }
 
 void main() {
