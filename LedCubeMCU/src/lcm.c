@@ -25,13 +25,17 @@ void main() {
     IRCF0_bit = 1;
 
     INTSRC_bit = 1;
-    PLLEN_bit = 1;
+    PLLEN_bit = TRUE;
 
     // Setup output pins
     ANSELC = 0;
     TRISB = 0x00;
     TRISD = 0x00;
     LATB = 0x00;
+
+    // Enable all interrupts
+    INTCON.GIE = TRUE;
+    INTCON.PEIE = TRUE;
 
     // Setup default variable values
     // and communications
@@ -43,6 +47,9 @@ void main() {
     // still being plugged in
     Delay_1sec();
 
+    sprintf(tf_buffer, "Device started.\n");
+    UARTStartTx();
+
     // Reset the Drivers
     TLC59116_ResetAll();
     TLC59116_Setup();
@@ -50,9 +57,6 @@ void main() {
     // Run Idle Pattern before allowing input
     IdlePattern();
 
-    // Enable all interrupts
-    INTCON.GIE = 1;
-    INTCON.PEIE = 1;
 
     while(TRUE) {
         Refresh();

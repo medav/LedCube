@@ -7,7 +7,7 @@ int arg_counter;
 
 byte tx_buffer[TXBUFFERSIZE];
 int tx_counter;
-byte tx_active;
+volatile byte tx_active;
 
 CUBECMD curcmd;
 
@@ -39,15 +39,26 @@ void InitUART() {
 
 }
 
-byte StartTx() {
+byte UARTStartTx() {
     if(tx_active != FALSE) return FALSE;
 
     tx_counter = 0;
     tx_active = TRUE;
 
+    PIE1.TX1IE = TRUE;
     TXREG1 = tx_buffer[0];
 
     return TRUE;
+}
+
+void UARTWaitTx() {
+    while(tx_active != FALSE);
+}
+
+void UARTSendStr(char * str) {
+    UARTWaitTx();
+    sprintf(tx_buffer, str);
+    UARTStartTx();
 }
 
 void UARTSend() {

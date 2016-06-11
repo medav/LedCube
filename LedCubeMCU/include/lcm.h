@@ -55,7 +55,7 @@ extern int led_power_duration;
 // comm.c
 extern byte arg_buffer[ARGBUFFERSIZE];
 extern byte tx_buffer[TXBUFFERSIZE];
-extern byte tx_active;
+extern volatile byte tx_active;
 extern CUBECMD curcmd;
 
 // ledctl.c
@@ -67,6 +67,9 @@ extern byte * buffer, * backbuffer;
 // ============= Function Prototypes =============
 // comm.c
 void InitUART();
+byte UARTStartTx();
+void UARTWaitTx();
+void UARTSendStr(char * str);
 void UARTSend();
 void UARTRecieve();
 void DispatchCmd();
