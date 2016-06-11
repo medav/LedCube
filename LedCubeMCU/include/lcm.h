@@ -1,10 +1,22 @@
 #ifndef LEDCUBEMCUDRIVER
 #define LEDCUBEMCUDRIVER
+
+// ============ Preprocessor Defines =============
+
 // Size for LED cube
 #define SIZE 8
 #define BUFFERSIZE 128
+#define ARGBUFFERSIZE 64
+#define TXBUFFERSIZE 128
+#define TRUE 1
+#define FALSE 0
+#define LEDON 1
+#define LEDOFF 0
+#define NULL (void*)0
 
-#include "TLC59116.h"
+// ===============================================
+
+// ================== Typedefs ===================
 
 // Enum for commands
 typedef enum {
@@ -16,7 +28,6 @@ typedef enum {
     ENDCMD = 0xFF
 } CUBECMD;
 
-// ===== Adjustable control data =====
 // Enum for use with SETCONTROL command
 // Prefix 'V_' for 'Variable'
 typedef enum {
@@ -25,38 +36,47 @@ typedef enum {
     V_AUTO_IDLE_TIMEOUT
 } CONTROLDATA;
 
-// Power duration for LEDs (0.05 ms)
+typedef unsigned char byte;
+typedef byte bool;
+
+// ===============================================
+
+// ============ Adjustable Variables =============
+
+// Power duration for LEDs (Expressed in number of
+// for loop iterations. Default is 1000)
 int led_power_duration;
 
 // Auto idle enable
-byte auto_idle_enable;
+bool auto_idle_enable;
 
 // Countdown to idle screen
 volatile int auto_idle_timeout;
-// ===================================
+// ===============================================
 
-// ========= Internal Data ===========
+// ================ Internal Data ================
 byte buffer1[BUFFERSIZE];
 byte buffer2[BUFFERSIZE];
 byte * buffer, * backbuffer;
 int buffer_counter;
 
-byte arg_buffer[64];
+byte arg_buffer[ARGBUFFERSIZE];
 int arg_counter;
 
+byte tx_buffer[TXBUFFERSIZE];
+int tx_counter;
+bool tx_active;
+
 volatile int auto_idle_counter;
-volatile byte auto_idle_flag;
+volatile bool auto_idle_flag;
 
 CUBECMD curcmd;
-byte args[16];
-// ===================================
+// ===============================================
 
-// ======= Function Prototypes =======
+// ============= Function Prototypes =============
 void DispatchCmd();
 void InitUART();
 void UARTRecieve();
-void InitDriverI2C();
-void Alive();
 void SetDefaults();
 void Refresh();
 void IdlePattern();
@@ -66,6 +86,6 @@ void SetVar(CONTROLDATA var, int val);
 void LedSet(byte x, byte y, byte z, byte val);
 void LedOn(byte x, byte y, byte z);
 void LedOff(byte x, byte y, byte z);
-// ===================================
+// ===============================================
 
 #endif

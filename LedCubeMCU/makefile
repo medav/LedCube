@@ -1,7 +1,7 @@
 MIKROCPATH=C:\Users\micha\Documents\Mikroelektronika\mikroC PRO for PIC
 DEVICE=P18LF45K22
 OSC=64
-SRC="LedCubeMCUDriver.c" "TLC59116.c"
+SRC="lcm.c" "tlc59116.c" "comm.c" "ledctl.c"
 
 
 all: default
