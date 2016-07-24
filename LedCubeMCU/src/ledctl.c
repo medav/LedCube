@@ -8,21 +8,25 @@ byte * buffer, * backbuffer;
 
 void Refresh() {
     int l, i;
+
+    TLC59116_ResetAll();
+    TLC59116_Setup();
+    TLC59116_Clear();
+    LATB = 0x80;
+    TLC59116_On();
+
     for(l = 0; l < SIZE; l++) {
         TLC59116_WriteLEDs(0, &buffer[l * 16 + 0]);
         TLC59116_WriteLEDs(1, &buffer[l * 16 + 4]);
         TLC59116_WriteLEDs(2, &buffer[l * 16 + 8]);
         TLC59116_WriteLEDs(3, &buffer[l * 16 + 12]);
 
-        LATB = 0x80 >> l;
-        TLC59116_On();
 
-        // TODO: find a way to force the optimizer not to
-        // remove this.
         for(i = 0; i < led_power_duration; i++);
 
-        LATB = 0x00;
+        TLC59116_Clear();
 
+        LATB = 0x80 >> (l + 1);
     }
 }
 

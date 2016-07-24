@@ -9,9 +9,9 @@ void TLC59116_ResetAll() {
 }
 
 void TLC59116_Setup() {
-    TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x01);
+    TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x11);
     TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE2, 0x00);
-    TLC59116_WriteReg(TLC59116_ALLCALLADDR, IREF, 0xCF);
+    TLC59116_WriteReg(TLC59116_ALLCALLADDR, IREF, 0x00);
     // 1  1  011111
     // |  \     |
     // CM  HC   CC
@@ -22,9 +22,9 @@ void TLC59116_On() {
     TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x01);
 }
 
-void TLC59116_Off() {
-    // Set Mode1 to 0x01 to turn on the Oscilator
-    TLC59116_WriteReg(TLC59116_ALLCALLADDR, MODE1, 0x11);
+void TLC59116_Clear() {
+    byte buffer[] = {0, 0, 0, 0};
+    TLC59116_WriteLEDs(TLC59116_ALLCALLADDR, buffer);
 }
 
 void TLC59116_WriteReg(byte addr, TLC59116REG reg, byte val) {

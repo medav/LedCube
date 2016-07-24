@@ -15,7 +15,6 @@ void InitUART() {
     // 230.4 kBaud
     // Multiplier on
     TXSTA1.BRGH = 1;
-    
     TXSTA1.BRG16 = 0;
 
     // SPBRGH1:SPBRG1 = 0x0010
@@ -23,20 +22,23 @@ void InitUART() {
     SPBRG1 = 16;
 
     // Want Async operation
-    TXSTA1.SYNC = 0;
-    TXSTA1.TXEN = 1;
-
-    // Enable Interrupts
-    PIE1.RC1IE = 1;
-    IPR1.RC1IP = 1;
+    TXSTA1.SYNC = FALSE;
+    TXSTA1.TXEN = TRUE;
 
     // Turn on the UART
-    RCSTA1.SPEN = 1;
-    RCSTA1.CREN = 1;
+    RCSTA1.SPEN = TRUE;
+    RCSTA1.CREN = TRUE;
 
     tx_active = FALSE;
     tx_counter = 0;
+    
+    // Enable Interrupts
+    PIE1.TX1IE = FALSE;
+    IPR1.RC1IP = 1;
+    IPR1.TX1IP = 1;
 
+    // This should be the LAST thing we do
+    PIE1.RC1IE = TRUE;
 }
 
 byte UARTStartTx() {
@@ -45,19 +47,20 @@ byte UARTStartTx() {
     tx_counter = 0;
     tx_active = TRUE;
 
-    PIE1.TX1IE = TRUE;
     TXREG1 = tx_buffer[0];
 
+    PIE1.TX1IE = TRUE;
+    
     return TRUE;
 }
 
 void UARTWaitTx() {
-    while(tx_active != FALSE);
+    while(tx_active != FALSE) { Refresh(); }
 }
 
 void UARTSendStr(char * str) {
     UARTWaitTx();
-    sprintf(tx_buffer, str);
+    sprintf(tx_buffer, "%s\r\n", str);
     UARTStartTx();
 }
 
@@ -66,12 +69,17 @@ void UARTSend() {
         tx_counter++;
 
         if(tx_counter > TXBUFFERSIZE || tx_buffer[tx_counter] == 0) {
+            PIE1.TX1IE = FALSE;
             tx_active = FALSE;
             tx_counter = 0;
             return;
         }
 
         TXREG1 = tx_buffer[tx_counter];
+    }
+    else {
+        // Invalid state - should never get here
+        PIE1.TX1IE = FALSE;
     }
 }
 
@@ -92,17 +100,29 @@ void UARTRecieve() {
         buffer_counter = 0;
         arg_counter = 0;
         break;
+
     case READFRAME:
-        if(buffer_counter < BUFFERSIZE)
-            buffer[buffer_counter++] = recv;
+        if(buffer_counter < BUFFERSIZE &&
+           (recv & 0xAA) == 0)
+            backbuffer[buffer_counter++] = recv;
+        else
+            curcmd = NOOP;
         break;
+
     case SETCONTROL:
         if(arg_counter < ARGBUFFERSIZE)
             arg_buffer[arg_counter++] = recv;
         break;
+
     default:
         curcmd = NOOP;
         break;
+    }
+
+    // Character commands (for debugging)
+    if (curcmd < READFRAME && curcmd > NOOP) {
+        DispatchCmd();
+        curcmd = NOOP;
     }
 }
 
@@ -124,12 +144,22 @@ void SetVar(CONTROLDATA var, int val) {
 
 void DispatchCmd() {
     switch(curcmd) {
+    case TRANSMITVARS:
+        DoTransmitVariables = TRUE;
+        break;
+
+    case RESETDRIVERS:
+        DoResetDrivers = TRUE;
+        break;
+
     case READFRAME:
         SwapBuffers();
         break;
+
     case SETCONTROL:
         SetVar(arg_buffer[0], *((int *) (arg_buffer + 1)));
         break;
+
     default:
         break;
     }

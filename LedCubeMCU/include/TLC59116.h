@@ -67,7 +67,7 @@ typedef enum {
 void TLC59116_ResetAll();
 void TLC59116_Setup();
 void TLC59116_On();
-void TLC59116_Off();
+void TLC59116_Clear();
 void TLC59116_WriteReg(byte addr, TLC59116REG reg, byte val);
 void TLC59116_WriteLEDs(byte addr, byte * val);
 

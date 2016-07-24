@@ -17,6 +17,9 @@
 // Enum for commands
 typedef enum {
     NOOP,
+    TRANSMITVARS = 0x64,
+    QUERYDRIVERS = 0x71,
+    RESETDRIVERS = 0x72,
     READFRAME = 0x91,
     SETCONTROL,
     IDLE,
@@ -58,6 +61,11 @@ extern byte tx_buffer[TXBUFFERSIZE];
 extern volatile byte tx_active;
 extern CUBECMD curcmd;
 
+// lcm.c
+extern volatile byte DoTransmitVariables;
+extern volatile byte DoQueryDrivers;
+extern volatile byte DoResetDrivers;
+
 // ledctl.c
 extern byte buffer1[BUFFERSIZE];
 extern byte buffer2[BUFFERSIZE];
@@ -76,6 +84,7 @@ void DispatchCmd();
 
 // lcm.c
 void SetDefaults();
+void TransmitVariables();
 
 // ledctl.c
 void Refresh();
