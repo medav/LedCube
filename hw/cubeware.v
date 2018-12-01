@@ -1,4 +1,4 @@
-module I2cController (
+module I2cController_2de2 (
     input [31 : 0] io_config_clock_threshold,
     input [31 : 0] io_config_clock_period,
     input io_req_valid,
@@ -75,7 +75,7 @@ module I2cController (
     wire ge_0_result;
     wire eq_0_result;
     wire ge_1_result;
-    wire [15 : 0] add_0_result;
+    wire [16 : 0] add_0_result;
     wire [7 : 0] mux_0_result;
     wire slice_0_result;
     wire slice_1_result;
@@ -90,10 +90,10 @@ module I2cController (
     wire eq_3_result;
     wire [15 : 0] sub_0_result;
     wire mux_8_result;
-    wire [31 : 0] add_8_result;
+    wire [32 : 0] add_8_result;
     wire eq_4_result;
     wire and_0_result;
-    wire [7 : 0] add_9_result;
+    wire [8 : 0] add_9_result;
     wire eq_5_result;
     wire slice_8_result;
     wire slice_9_result;
@@ -107,7 +107,7 @@ module I2cController (
     wire not_0_result;
     wire and_1_result;
     wire eq_7_result;
-    wire [15 : 0] add_10_result;
+    wire [16 : 0] add_10_result;
     wire eq_8_result;
     wire [7 : 0] sub_1_result;
     wire eq_9_result;
@@ -549,6 +549,258 @@ module I2cController (
         if (eq_4_result) begin
             if (and_0_result) begin
                 packet_i17 <= io_req_data_payload_i15;
+            end
+        end
+    end
+endmodule
+module TlcController (
+    input [31 : 0] io_config_i2c_config_clock_threshold,
+    input [31 : 0] io_config_i2c_config_clock_period,
+    input [7 : 0] io_config_mode1,
+    input [7 : 0] io_config_mode2,
+    input [7 : 0] io_config_iref,
+    input io_clear,
+    input io_update,
+    output io_ready,
+    inout io_i2c_sda,
+    inout io_i2c_scl,
+    output io_i2c_resetn,
+    input [7 : 0] io_led_state_in_i0,
+    input [7 : 0] io_led_state_in_i1,
+    input [7 : 0] io_led_state_in_i2,
+    input [7 : 0] io_led_state_in_i3,
+    input [7 : 0] io_led_state_in_i4,
+    input [7 : 0] io_led_state_in_i5,
+    input [7 : 0] io_led_state_in_i6,
+    input [7 : 0] io_led_state_in_i7,
+    input [7 : 0] io_led_state_in_i8,
+    input [7 : 0] io_led_state_in_i9,
+    input [7 : 0] io_led_state_in_i10,
+    input [7 : 0] io_led_state_in_i11,
+    input [7 : 0] io_led_state_in_i12,
+    input [7 : 0] io_led_state_in_i13,
+    input [7 : 0] io_led_state_in_i14,
+    input [7 : 0] io_led_state_in_i15,
+    input io_clock,
+    input io_reset
+);
+    // Internal Signal Declarations
+    reg [2 : 0] state;
+    wire [31 : 0] I2cController_2de2_0_config_clock_threshold;
+    wire [31 : 0] I2cController_2de2_0_config_clock_period;
+    wire I2cController_2de2_0_req_valid;
+    wire I2cController_2de2_0_req_ready;
+    wire [7 : 0] I2cController_2de2_0_req_data_size;
+    wire [7 : 0] I2cController_2de2_0_req_data_address;
+    wire [7 : 0] I2cController_2de2_0_req_data_header;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i0;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i1;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i2;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i3;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i4;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i5;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i6;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i7;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i8;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i9;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i10;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i11;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i12;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i13;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i14;
+    wire [7 : 0] I2cController_2de2_0_req_data_payload_i15;
+    wire I2cController_2de2_0_i2c_sda;
+    wire I2cController_2de2_0_i2c_scl;
+    wire I2cController_2de2_0_i2c_resetn;
+    wire I2cController_2de2_0_error;
+    wire I2cController_2de2_0_clock;
+    wire I2cController_2de2_0_reset;
+    wire eq_12_result;
+    wire eq_13_result;
+    wire eq_14_result;
+    wire eq_15_result;
+    wire eq_16_result;
+    wire eq_17_result;
+    wire eq_18_result;
+    wire eq_19_result;
+    
+    // Operator Synthesis
+    I2cController_2de2 I2cController_2de2_0 (
+        .io_config_clock_threshold(I2cController_2de2_0_config_clock_threshold),
+        .io_config_clock_period(I2cController_2de2_0_config_clock_period),
+        .io_req_valid(I2cController_2de2_0_req_valid),
+        .io_req_ready(I2cController_2de2_0_req_ready),
+        .io_req_data_size(I2cController_2de2_0_req_data_size),
+        .io_req_data_address(I2cController_2de2_0_req_data_address),
+        .io_req_data_header(I2cController_2de2_0_req_data_header),
+        .io_req_data_payload_i0(I2cController_2de2_0_req_data_payload_i0),
+        .io_req_data_payload_i1(I2cController_2de2_0_req_data_payload_i1),
+        .io_req_data_payload_i2(I2cController_2de2_0_req_data_payload_i2),
+        .io_req_data_payload_i3(I2cController_2de2_0_req_data_payload_i3),
+        .io_req_data_payload_i4(I2cController_2de2_0_req_data_payload_i4),
+        .io_req_data_payload_i5(I2cController_2de2_0_req_data_payload_i5),
+        .io_req_data_payload_i6(I2cController_2de2_0_req_data_payload_i6),
+        .io_req_data_payload_i7(I2cController_2de2_0_req_data_payload_i7),
+        .io_req_data_payload_i8(I2cController_2de2_0_req_data_payload_i8),
+        .io_req_data_payload_i9(I2cController_2de2_0_req_data_payload_i9),
+        .io_req_data_payload_i10(I2cController_2de2_0_req_data_payload_i10),
+        .io_req_data_payload_i11(I2cController_2de2_0_req_data_payload_i11),
+        .io_req_data_payload_i12(I2cController_2de2_0_req_data_payload_i12),
+        .io_req_data_payload_i13(I2cController_2de2_0_req_data_payload_i13),
+        .io_req_data_payload_i14(I2cController_2de2_0_req_data_payload_i14),
+        .io_req_data_payload_i15(I2cController_2de2_0_req_data_payload_i15),
+        .io_i2c_sda(I2cController_2de2_0_i2c_sda),
+        .io_i2c_scl(I2cController_2de2_0_i2c_scl),
+        .io_i2c_resetn(I2cController_2de2_0_i2c_resetn),
+        .io_error(I2cController_2de2_0_error),
+        .io_clock(I2cController_2de2_0_clock),
+        .io_reset(I2cController_2de2_0_reset)
+    );
+    assign eq_12_result = state == 0;
+    assign eq_13_result = state == 1;
+    assign eq_14_result = state == 2;
+    assign eq_15_result = state == 3;
+    assign eq_16_result = state == 4;
+    assign eq_17_result = state == 5;
+    assign eq_18_result = state == 6;
+    assign eq_19_result = state == 7;
+    
+    // Connections
+    assign io_ready = eq_15_result ? 1 : 0;
+    assign io_i2c_sda = I2cController_2de2_0_i2c_sda;
+    assign io_i2c_scl = I2cController_2de2_0_i2c_scl;
+    assign io_i2c_resetn = eq_19_result ? 0 : I2cController_2de2_0_i2c_resetn;
+    assign I2cController_2de2_0_config_clock_threshold = io_config_i2c_config_clock_threshold;
+    assign I2cController_2de2_0_config_clock_period = io_config_i2c_config_clock_period;
+    wire _NODE_7;
+    wire _NODE_8;
+    wire _NODE_9;
+    wire _NODE_10;
+    wire _NODE_11;
+    assign _NODE_11 = eq_12_result ? 1 : 0;
+    assign _NODE_10 = eq_13_result ? 1 : _NODE_11;
+    assign _NODE_9 = eq_14_result ? 1 : _NODE_10;
+    assign _NODE_8 = eq_16_result ? 1 : _NODE_9;
+    assign _NODE_7 = eq_17_result ? 1 : _NODE_8;
+    assign I2cController_2de2_0_req_valid = eq_18_result ? 1 : _NODE_7;
+    wire [7 : 0] _NODE_12;
+    wire [7 : 0] _NODE_13;
+    wire [7 : 0] _NODE_14;
+    wire [7 : 0] _NODE_15;
+    wire [7 : 0] _NODE_16;
+    assign _NODE_16 = eq_12_result ? 1 : 0;
+    assign _NODE_15 = eq_13_result ? 2 : _NODE_16;
+    assign _NODE_14 = eq_14_result ? 1 : _NODE_15;
+    assign _NODE_13 = eq_16_result ? 4 : _NODE_14;
+    assign _NODE_12 = eq_17_result ? 16 : _NODE_13;
+    assign I2cController_2de2_0_req_data_size = eq_18_result ? 4 : _NODE_12;
+    wire [7 : 0] _NODE_17;
+    wire [7 : 0] _NODE_18;
+    wire [7 : 0] _NODE_19;
+    wire [7 : 0] _NODE_20;
+    wire [7 : 0] _NODE_21;
+    assign _NODE_21 = eq_12_result ? 214 : 0;
+    assign _NODE_20 = eq_13_result ? 208 : _NODE_21;
+    assign _NODE_19 = eq_14_result ? 208 : _NODE_20;
+    assign _NODE_18 = eq_16_result ? 208 : _NODE_19;
+    assign _NODE_17 = eq_17_result ? 208 : _NODE_18;
+    assign I2cController_2de2_0_req_data_address = eq_18_result ? 208 : _NODE_17;
+    wire [7 : 0] _NODE_22;
+    wire [7 : 0] _NODE_23;
+    wire [7 : 0] _NODE_24;
+    wire [7 : 0] _NODE_25;
+    wire [7 : 0] _NODE_26;
+    assign _NODE_26 = eq_12_result ? 165 : 0;
+    assign _NODE_25 = eq_13_result ? 128 : _NODE_26;
+    assign _NODE_24 = eq_14_result ? 128 : _NODE_25;
+    assign _NODE_23 = eq_16_result ? 148 : _NODE_24;
+    assign _NODE_22 = eq_17_result ? 130 : _NODE_23;
+    assign I2cController_2de2_0_req_data_header = eq_18_result ? 148 : _NODE_22;
+    wire [7 : 0] _NODE_27;
+    wire [7 : 0] _NODE_28;
+    wire [7 : 0] _NODE_29;
+    wire [7 : 0] _NODE_30;
+    wire [7 : 0] _NODE_31;
+    assign _NODE_31 = eq_12_result ? 90 : 0;
+    assign _NODE_30 = eq_13_result ? io_config_mode1 : _NODE_31;
+    assign _NODE_29 = eq_14_result ? io_config_iref : _NODE_30;
+    assign _NODE_28 = eq_16_result ? 0 : _NODE_29;
+    assign _NODE_27 = eq_17_result ? io_led_state_in_i0 : _NODE_28;
+    assign I2cController_2de2_0_req_data_payload_i0 = eq_18_result ? 170 : _NODE_27;
+    wire [7 : 0] _NODE_32;
+    wire [7 : 0] _NODE_33;
+    assign _NODE_33 = eq_13_result ? io_config_mode2 : 0;
+    assign _NODE_32 = eq_17_result ? io_led_state_in_i1 : _NODE_33;
+    assign I2cController_2de2_0_req_data_payload_i1 = eq_18_result ? 170 : _NODE_32;
+    wire [7 : 0] _NODE_34;
+    assign _NODE_34 = eq_17_result ? io_led_state_in_i2 : 0;
+    assign I2cController_2de2_0_req_data_payload_i2 = eq_18_result ? 170 : _NODE_34;
+    wire [7 : 0] _NODE_35;
+    assign _NODE_35 = eq_17_result ? io_led_state_in_i3 : 0;
+    assign I2cController_2de2_0_req_data_payload_i3 = eq_18_result ? 170 : _NODE_35;
+    assign I2cController_2de2_0_req_data_payload_i4 = eq_17_result ? io_led_state_in_i4 : 0;
+    assign I2cController_2de2_0_req_data_payload_i5 = eq_17_result ? io_led_state_in_i5 : 0;
+    assign I2cController_2de2_0_req_data_payload_i6 = eq_17_result ? io_led_state_in_i6 : 0;
+    assign I2cController_2de2_0_req_data_payload_i7 = eq_17_result ? io_led_state_in_i7 : 0;
+    assign I2cController_2de2_0_req_data_payload_i8 = eq_17_result ? io_led_state_in_i8 : 0;
+    assign I2cController_2de2_0_req_data_payload_i9 = eq_17_result ? io_led_state_in_i9 : 0;
+    assign I2cController_2de2_0_req_data_payload_i10 = eq_17_result ? io_led_state_in_i10 : 0;
+    assign I2cController_2de2_0_req_data_payload_i11 = eq_17_result ? io_led_state_in_i11 : 0;
+    assign I2cController_2de2_0_req_data_payload_i12 = eq_17_result ? io_led_state_in_i12 : 0;
+    assign I2cController_2de2_0_req_data_payload_i13 = eq_17_result ? io_led_state_in_i13 : 0;
+    assign I2cController_2de2_0_req_data_payload_i14 = eq_17_result ? io_led_state_in_i14 : 0;
+    assign I2cController_2de2_0_req_data_payload_i15 = eq_17_result ? io_led_state_in_i15 : 0;
+    assign I2cController_2de2_0_clock = io_clock;
+    assign I2cController_2de2_0_reset = io_reset;
+    always @(posedge(io_clock)) begin
+        if (io_reset) begin
+            state <= 0;
+        end
+        else begin
+            state <= state;
+            if (I2cController_2de2_0_error) begin
+                state <= 7;
+            end
+            if (eq_12_result) begin
+                if (I2cController_2de2_0_req_ready) begin
+                    state <= 1;
+                end
+            end
+            if (eq_13_result) begin
+                if (I2cController_2de2_0_req_ready) begin
+                    state <= 2;
+                end
+            end
+            if (eq_14_result) begin
+                if (I2cController_2de2_0_req_ready) begin
+                    state <= 3;
+                end
+            end
+            if (eq_15_result) begin
+                if (io_clear) begin
+                    state <= 4;
+                end
+                if (io_update) begin
+                    state <= 5;
+                end
+            end
+            if (eq_16_result) begin
+                if (I2cController_2de2_0_req_ready) begin
+                    state <= 3;
+                end
+            end
+            if (eq_17_result) begin
+                if (I2cController_2de2_0_req_ready) begin
+                    state <= 6;
+                end
+            end
+            if (eq_18_result) begin
+                if (I2cController_2de2_0_req_ready) begin
+                    state <= 3;
+                end
+            end
+            if (eq_19_result) begin
+                state <= 0;
             end
         end
     end
