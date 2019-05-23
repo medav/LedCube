@@ -1,13 +1,18 @@
 from atlas import *
 
+num_tlcs = 4
+cube_size = 8
+ram_depth = cube_size ** 3
+
 #
 # I2C Related Interfaces
 #
 
 i2c_if = {
-    'sda': Inout(Bits(1)),
-    'scl': Inout(Bits(1)),
-    'resetn': Output(Bits(1)),
+    'sda_o': Bits(1),
+    'sda_i': Flip(Bits(1)),
+    'scl_o': Bits(1),
+    'scl_i': Flip(Bits(1)),
 }
 
 def I2cPacket(max_size : int = 16):
@@ -17,6 +22,15 @@ def I2cPacket(max_size : int = 16):
         'header': Bits(8),
         'payload': [Bits(8) for _ in range(max_size)]
     }
+
+#
+# Refresh Controller <--> TLC[]
+#
+
+tlc_cmd_if = {
+    'opcode': Bits(4),
+    'ready': Flip(Bits(1)),
+}
 
 #
 # Config Related Interfaces
@@ -29,14 +43,11 @@ i2c_config = {
 
 tlc_config = {
     'i2c_config': i2c_config,
-    'mode1': Bits(8),
-    'mode2': Bits(8),
-    'iref': Bits(8)
 }
 
 refresh_config = {
-    'tlc_config': tlc_config,
-    'display_cycles': Bits(32)
+    'disp_cycles': Bits(32),
+    'enable': Bits(8)
 }
 
 #

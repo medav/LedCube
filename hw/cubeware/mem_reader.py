@@ -3,7 +3,7 @@ from atlas import *
 from interfaces import *
 
 @Module
-def MemReader(cube_size):
+def MemReader():
     ram_depth = cube_size ** 3
     layer_size = cube_size ** 2
 
@@ -11,22 +11,23 @@ def MemReader(cube_size):
         'ram_read': Output(BramReadIf(8, ram_depth)),
         'start': Input(Bits(1)),
         'layer': Input(Bits(Log2Ceil(cube_size))),
-        'led_state_out': Output([Bits(8) for _ in range(layer_size)]),
         'done': Output(Bits(1)),
+        'output': Output({
+            'wen': Bits(1),
+            'bank': Bits(Log2Ceil(num_tlcs)),
+            'index': Bits(4),
+            'data': Bits(8)
+        })
     })
 
-    led_state = Reg(
-        [Bits(8) for _ in range(layer_size)],
-        reset_value=[0 for _ in range(layer_size)])
-
-    read_counter = Reg(Bits(32), reset_value=0)
-    base_address = Reg(Bits(32), reset_value=0)
-    done = Reg(Bits(1), reset_value=False)
-    capture_read = Reg(Bits(1), reset_value=False)
-    capture_counter = Reg(Bits(32))
-
-    io.led_state_out <<= led_state
+    done = Reg(Bits(1), reset_value=True)
     io.done <<= done
+
+    read_counter = Reg(Bits(9), reset_value=0)
+    base_address = Reg(Bits(9), reset_value=0)
+
+    capture_read = Reg(Bits(1), reset_value=False)
+    capture_counter = Reg(Bits(9))
 
     capture_counter <<= read_counter
 
@@ -66,7 +67,9 @@ def MemReader(cube_size):
             done <<= True
 
 
-    with capture_read:
-        led_state[capture_counter] <<= io.ram_read.data
+    io.output.wen <<= capture_read
+    io.output.bank <<= capture_counter(5, 4)
+    io.output.index <<= capture_counter(3, 0)
+    io.output.data <<= io.ram_read.data
 
     NameSignals(locals())

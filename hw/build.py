@@ -2,16 +2,16 @@ import sys
 import os
 
 sys.path.append('./cubeware')
-sys.path.append('../../atlas')
+# sys.path.append('../../atlas')
 
 from atlas import *
-from refresh_controller import RefreshController
+from cubeware import Cubeware
 
 circuit = Circuit('cubeware', True, True)
 
 print('Elaborating...')
 with Context(circuit):
-    circuit.top = RefreshController()
+    circuit.top = Cubeware()
 
 print('Synthesizing...')
 EmitCircuit(circuit, 'cubeware.v')

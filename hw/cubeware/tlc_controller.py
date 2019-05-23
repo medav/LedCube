@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from atlas import *
 
 from interfaces import *
@@ -44,29 +46,40 @@ class TlcRegisters(object):
     EFLAG1 = 29
     EFLAG2 = 30
 
+class TlcCmd():
+    NOP = 0
+    SOFT_RESET = 1
+    SET_IREF = 4
+    OSC_ON = 5
+    OSC_OFF = 6
+    WRITE_LEDS = 7
+    ENABLE_LEDS = 8
+    DISABLE_LEDS = 9
+
 @Module
 def TlcController():
     io = Io({
+        'i2c': Output(i2c_if),
+        'resetn': Output(Bits(1)),
         'config': Input(tlc_config),
-        'clear': Input(Bits(1)),
-        'update': Input(Bits(1)),
-        'ready': Output(Bits(1)),
-        'i2c': i2c_if,
-        'led_state_in': Input([Bits(8) for _ in range(16)])
+        'cmd': Input(tlc_cmd_if),
+        'args': Input([Bits(8) for _ in range(16)]),
+        'err_count': Output(Bits(32))
     })
 
     states = Enum([
-        'reset',
-        'setup_mode',
-        'setup_iref',
+        'hard_reset',
+        'soft_reset',
         'ready',
-        'clear',
-        'update',
-        'enable',
         'error'
     ])
 
-    state = Reg(Bits(states.bitwidth), reset_value=states.reset)
+    state = Reg(Bits(states.bitwidth), reset_value=states.hard_reset)
+
+    error_count = Reg(Bits(32), reset_value=0)
+    io.err_count <<= error_count
+
+    reset_counter = Reg(Bits(16), reset_value=0)
 
     i2c_ctrl = Instance(I2cController(16))
     i2c_ctrl.config <<= io.config.i2c_config
@@ -76,40 +89,24 @@ def TlcController():
     i2c_ctrl.req.data.size <<= 0
     i2c_ctrl.req.data.address <<= 0
     i2c_ctrl.req.data.header <<= 0
-    i2c_ctrl.req.data.payload <<= [0 for _ in range(16)]
+    i2c_ctrl.req.data.payload <<= io.args
 
-    io.ready <<= False
+    io.resetn <<= 1
+    io.cmd.ready <<= False
 
-    with i2c_ctrl.error:
-        state <<= states.error
+    # with i2c_ctrl.error:
+    #     state <<= states.error
 
     def MakeRequest(size, address, direction, header, next_state):
         nonlocal state
-
         i2c_ctrl.req.valid <<= True
         i2c_ctrl.req.data.size <<= size
         i2c_ctrl.req.data.address <<= (address << 1) | direction
         i2c_ctrl.req.data.header <<= header
-
         with i2c_ctrl.req.ready:
             state <<= next_state
 
-    with state == states.reset:
-        MakeRequest(1, 0x6B, WRITE, 0xA5, states.setup_mode)
-        i2c_ctrl.req.data.payload[0] <<= 0x5A
-
-    with state == states.setup_mode:
-        MakeRequest(
-            2,
-            ALLCALLADDR,
-            WRITE,
-            AUTOINC_ALL | TlcRegisters.MODE1,
-            states.setup_iref)
-
-        i2c_ctrl.req.data.payload[0] <<= io.config.mode1
-        i2c_ctrl.req.data.payload[1] <<= io.config.mode2
-
-    with state == states.setup_iref:
+    def SetRegister(reg_addr):
         MakeRequest(
             1,
             ALLCALLADDR,
@@ -117,54 +114,82 @@ def TlcController():
             AUTOINC_ALL | TlcRegisters.MODE1,
             states.ready)
 
-        i2c_ctrl.req.data.payload[0] <<= io.config.iref
+    @contextmanager
+    def Opcode(opcode):
+        nonlocal io
+        with io.cmd.opcode == opcode:
+            yield
+
+    with state == states.hard_reset:
+        io.resetn <<= 0
+        reset_counter <<= reset_counter + 1
+        i2c_ctrl.reset <<= 1
+
+        with reset_counter > 50:
+            io.resetn <<= 1
+            i2c_ctrl.reset <<= 0
+
+            with reset_counter > 100:
+                reset_counter <<= 0
+                state <<= states.soft_reset
+
+    with state == states.soft_reset:
+        MakeRequest(1, 0x6B, WRITE, 0xA5, states.ready)
+        i2c_ctrl.req.data.payload[0] <<= 0x5A
 
     with state == states.ready:
-        io.ready <<= True
+        io.cmd.ready <<= i2c_ctrl.req.ready
 
-        with io.clear:
-            state <<= states.clear
+        with Opcode(TlcCmd.SOFT_RESET):
+            state <<= states.soft_reset
 
-        with io.update:
-            state <<= states.update
+        with Opcode(TlcCmd.SET_IREF):
+            SetRegister(TlcRegisters.IREF)
 
-    with state == states.clear:
-        MakeRequest(
-            4,
-            ALLCALLADDR,
-            WRITE,
-            AUTOINC_ALL | TlcRegisters.LEDOUT0,
-            states.ready)
+        with Opcode(TlcCmd.OSC_ON):
+            SetRegister(TlcRegisters.MODE1)
+            i2c_ctrl.req.data.payload[0] <<= 0x01
 
-        for i in range(4):
-            i2c_ctrl.req.data.payload[0] <<= 0
+        with Opcode(TlcCmd.OSC_OFF):
+            SetRegister(TlcRegisters.MODE1)
+            i2c_ctrl.req.data.payload[0] <<= 0x11
 
+        with Opcode(TlcCmd.WRITE_LEDS):
+            MakeRequest(
+                16,
+                ALLCALLADDR,
+                WRITE,
+                AUTOINC_ALL | TlcRegisters.PWM0,
+                states.ready)
 
-    with state == states.update:
-        MakeRequest(
-            16,
-            ALLCALLADDR,
-            WRITE,
-            AUTOINC_ALL | TlcRegisters.PWM0,
-            states.enable)
+        with Opcode(TlcCmd.ENABLE_LEDS):
+            MakeRequest(
+                4,
+                ALLCALLADDR,
+                WRITE,
+                AUTOINC_ALL | TlcRegisters.LEDOUT0,
+                states.ready)
 
-        for i in range(16):
-            i2c_ctrl.req.data.payload[i] <<= io.led_state_in[i]
+            i2c_ctrl.req.data.payload[0] <<= 0xAA
+            i2c_ctrl.req.data.payload[1] <<= 0xAA
+            i2c_ctrl.req.data.payload[2] <<= 0xAA
+            i2c_ctrl.req.data.payload[3] <<= 0xAA
 
-    with state == states.enable:
+        with Opcode(TlcCmd.DISABLE_LEDS):
+            MakeRequest(
+                4,
+                ALLCALLADDR,
+                WRITE,
+                AUTOINC_ALL | TlcRegisters.LEDOUT0,
+                states.ready)
 
-        MakeRequest(
-            4,
-            ALLCALLADDR,
-            WRITE,
-            AUTOINC_ALL | TlcRegisters.LEDOUT0,
-            states.ready)
-
-        for i in range(4):
-            i2c_ctrl.req.data.payload[i] <<= 0xAA
+            i2c_ctrl.req.data.payload[0] <<= 0x00
+            i2c_ctrl.req.data.payload[1] <<= 0x00
+            i2c_ctrl.req.data.payload[2] <<= 0x00
+            i2c_ctrl.req.data.payload[3] <<= 0x00
 
     with state == states.error:
-        io.i2c.resetn <<= False
-        state <<= states.reset
+        error_count <<= error_count + 1
+        state <<= states.ready
 
     NameSignals(locals())

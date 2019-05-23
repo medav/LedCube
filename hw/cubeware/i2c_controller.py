@@ -11,7 +11,7 @@ def I2cController(max_packet_size : int = 16):
             'ready': Flip(Bits(1)),
             'data': I2cPacket(max_packet_size)
         }),
-        'i2c': i2c_if,
+        'i2c': Output(i2c_if),
         'error': Output(Bits(1))
     })
 
@@ -63,7 +63,7 @@ def I2cController(max_packet_size : int = 16):
     next_data = Wire([Bits(1) for _ in range(8)])
 
     for i in range(8):
-        next_data[i] <<= packet[data_counter + 1](i, i)
+        next_data[i] <<= packet[data_counter + 1](7 - i, 7 - i)
 
     data_reg = \
         Reg([Bits(1) for _ in range(8)], reset_value=[0 for _ in range(8)])
@@ -93,17 +93,17 @@ def I2cController(max_packet_size : int = 16):
     sda_state = Wire(Bits(2))
     scl_state = Wire(Bits(2))
 
-    io.i2c.sda <<= '1\'bZ'
-    io.i2c.scl <<= '1\'bZ'
+    io.i2c.sda_o <<= 1
+    io.i2c.scl_o <<= 1
 
     with sda_state == sda_pulldown:
-        io.i2c.sda <<= 0
+        io.i2c.sda_o <<= 0
 
     with sda_state == sda_active:
-        io.i2c.sda <<= data_out
+        io.i2c.sda_o <<= data_out
 
     with scl_state == scl_active:
-        io.i2c.scl <<= pulse
+        io.i2c.scl_o <<= pulse
 
     #
     # Default Values
@@ -113,8 +113,7 @@ def I2cController(max_packet_size : int = 16):
     scl_state <<= scl_disable
     io.req.ready <<= False
     io.error <<= False
-    io.i2c.resetn <<= False
-    data_out <<= data_reg[7 - beat_counter]
+    data_out <<= data_reg[beat_counter]
     clock_counter <<= clock_counter + 1
 
     #
@@ -166,7 +165,7 @@ def I2cController(max_packet_size : int = 16):
         with pulse:
             state <<= states.write
             clock_counter <<= 0
-            data_reg <<= [packet[0](i, i) for i in range(8)]
+            data_reg <<= [packet[0](7 - i, 7 - i) for i in range(8)]
 
     with state == states.write:
         sda_state <<= sda_active
@@ -179,19 +178,18 @@ def I2cController(max_packet_size : int = 16):
         # simply holds its value until the slave releases the clock.
         #
 
-        with pulse & ~io.i2c.scl:
-            clock_counter <<= clock_counter
+        # with pulse & ~io.i2c.scl_i:
+        #     clock_counter <<= clock_counter
 
-        with otherwise:
-            with beat_finished:
-                clock_counter <<= 0
+        with beat_finished:
+            clock_counter <<= 0
 
-                with beat_counter == 7:
-                    beat_counter <<= 0
-                    state <<= states.nack
+            with beat_counter == 7:
+                beat_counter <<= 0
+                state <<= states.nack
 
-                with otherwise:
-                    beat_counter <<= beat_counter + 1
+            with otherwise:
+                beat_counter <<= beat_counter + 1
 
     with state == states.nack:
         scl_state <<= scl_active
@@ -212,8 +210,8 @@ def I2cController(max_packet_size : int = 16):
         # HIGH, this indicates a failed NACK.
         #
 
-        with rising_edge & io.i2c.sda:
-            state <<= states.error
+        # with rising_edge & io.i2c.sda_i:
+        #     state <<= states.error
 
     with state == states.error:
 

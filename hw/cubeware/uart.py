@@ -178,12 +178,3 @@ def UartTransmitter(clock_rate, baud_rate, fifo_depth):
             state <<= states.idle
 
     NameSignals(locals())
-
-
-circuit = Circuit('uart', True, True)
-
-with Context(circuit):
-    UartReceiver(50000000, 115200, 8)
-    circuit.top = UartTransmitter(50000000, 115200, 8)
-
-EmitCircuit(circuit, 'tests/uart.v')
