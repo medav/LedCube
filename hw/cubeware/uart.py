@@ -80,7 +80,7 @@ def UartReceiver(clock_rate, baud_rate, fifo_depth):
                 bit_counter <<= bit_counter + 1
 
     with state == states.stop:
-        with clock_counter == clocks_per_bit:
+        with clock_counter == clocks_per_half_bit:
             state <<= states.idle
             enqueue <<= 1
 

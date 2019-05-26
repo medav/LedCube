@@ -9,6 +9,8 @@ def RefreshController():
     io = Io({
         'config': Input(refresh_config),
         'tlcs': Output([tlc_cmd_if for _ in range(num_tlcs)]),
+        'tlc_args': Output([Bits(8) for _ in range(16)]),
+        'tlc_override': Output(Bits(1)),
         'reader': Output({
             'start': Bits(1),
             'layer': Bits(Log2Ceil(cube_size)),
@@ -38,30 +40,60 @@ def RefreshController():
     io.reader.start <<= False
     io.reader.layer <<= layer_counter
 
+    io.tlc_override <<= False
+    io.tlc_args <<= [0 for _ in range(16)]
+
     states = Enum([
-        'init', # 000
+        'stopped', # 000
         'reset', # 001
+        'init_mode1',
+        'init_mode2',
+        'init_iref',
+        'init_wait',
         'osc_on', # 010
         'wr_leds', # 011
         'en_leds', # 100
         'disp', # 101
         'osc_off', # 110
+        'disable_leds',
+        'delay',
         'next_layer' # 111
     ])
 
-    state = Reg(Bits(states.bitwidth), reset_value=states.init)
+    state = Reg(Bits(states.bitwidth), reset_value=states.stopped)
 
-    with state == states.init:
-        with tlcs_ready & (io.config.enable != 0):
+    with state == states.stopped:
+        with io.config.enable != 0:
             layer_counter <<= 0
             layer_mask <<= 0x01
-            io.reader.start <<= True
             state <<= states.reset
+            io.reader.start <<= True
 
     with state == states.reset:
         with tlcs_ready:
             tlcs_cmd <<= TlcCmd.SOFT_RESET
+            state <<= states.init_mode1
+
+    with state == states.init_mode1:
+        with tlcs_ready:
+            state <<= states.init_mode2
+            tlcs_cmd <<= TlcCmd.SET_MODE1
+            io.tlc_args[0] <<= 0x11
+            io.tlc_override <<= True
+
+    with state == states.init_mode2:
+        with tlcs_ready:
+            state <<= states.init_iref
+            tlcs_cmd <<= TlcCmd.SET_MODE2
+            io.tlc_args[0] <<= 0x00
+            io.tlc_override <<= True
+
+    with state == states.init_iref:
+        with tlcs_ready:
             state <<= states.osc_on
+            tlcs_cmd <<= TlcCmd.SET_IREF
+            io.tlc_args[0] <<= io.config.iref
+            io.tlc_override <<= True
 
     with state == states.osc_on:
         with tlcs_ready & io.reader.done:
@@ -86,16 +118,28 @@ def RefreshController():
 
         with disp_counter > io.config.disp_cycles:
             disp_counter <<= 0
+            layer_mask <<= 0
+            state <<= states.disable_leds
+
+    with state == states.disable_leds:
+        with tlcs_ready:
+            tlcs_cmd <<= TlcCmd.DISABLE_LEDS
             state <<= states.osc_off
 
     with state == states.osc_off:
         with tlcs_ready:
             tlcs_cmd <<= TlcCmd.OSC_OFF
+            state <<= states.delay
+
+    with state == states.delay:
+        disp_counter <<= disp_counter + 1
+        with disp_counter > io.config.delay_cycles:
+            disp_counter <<= 0
             state <<= states.next_layer
 
     with state == states.next_layer:
         with io.config.enable == 0:
-            state <<= states.init
+            state <<= states.stopped
             layer_mask <<= 0
         with otherwise:
             state <<= states.reset

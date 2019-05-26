@@ -49,6 +49,8 @@ class TlcRegisters(object):
 class TlcCmd():
     NOP = 0
     SOFT_RESET = 1
+    SET_MODE1 = 2
+    SET_MODE2 = 3
     SET_IREF = 4
     OSC_ON = 5
     OSC_OFF = 6
@@ -70,6 +72,7 @@ def TlcController():
     states = Enum([
         'hard_reset',
         'soft_reset',
+        'setup_iref',
         'ready',
         'error'
     ])
@@ -111,7 +114,7 @@ def TlcController():
             1,
             ALLCALLADDR,
             WRITE,
-            AUTOINC_ALL | TlcRegisters.MODE1,
+            AUTOINC_ALL | reg_addr,
             states.ready)
 
     @contextmanager
@@ -145,6 +148,12 @@ def TlcController():
 
         with Opcode(TlcCmd.SET_IREF):
             SetRegister(TlcRegisters.IREF)
+
+        with Opcode(TlcCmd.SET_MODE1):
+            SetRegister(TlcRegisters.MODE1)
+
+        with Opcode(TlcCmd.SET_MODE2):
+            SetRegister(TlcRegisters.MODE2)
 
         with Opcode(TlcCmd.OSC_ON):
             SetRegister(TlcRegisters.MODE1)

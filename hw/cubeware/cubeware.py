@@ -86,7 +86,10 @@ def Cubeware():
         io.resetns[i] <<= tlcs[i].resetn
         tlcs[i].config <<= csrs.config.tlc
         tlcs[i].cmd <<= rc.tlcs[i]
-        tlcs[i].args <<= tlc_arg_regs[i]
+        with rc.tlc_override:
+            tlcs[i].args <<= rc.tlc_args
+        with otherwise:
+            tlcs[i].args <<= tlc_arg_regs[i]
 
     #
     # Command FSM

@@ -19,7 +19,9 @@ def Csrs():
     clock_period = Reg([Bits(8) for _ in range(4)], reset_value=[100, 0, 0, 0])
     clock_threshold = Reg([Bits(8) for _ in range(4)], reset_value=[50, 0, 0, 0])
     disp_cycles = Reg([Bits(8) for _ in range(4)], reset_value=[0x70, 0x11, 0x01, 0x00])
+    delay_cycles = Reg([Bits(8) for _ in range(4)], reset_value=[0x00, 0x10, 0x00, 0x00])
     enable_rc = Reg(Bits(8), reset_value=1)
+    iref = Reg(Bits(8), reset_value=0x00)
 
     io.config.tlc.i2c_config.clock_threshold <<= Cat([
         clock_threshold[3],
@@ -42,6 +44,15 @@ def Csrs():
         disp_cycles[0]
     ])
 
+
+    io.config.refresh.delay_cycles <<= Cat([
+        delay_cycles[3],
+        delay_cycles[2],
+        delay_cycles[1],
+        delay_cycles[0]
+    ])
+
+    io.config.refresh.iref <<= iref
     io.config.refresh.enable <<= enable_rc
 
     def MapCsr(addr, csr):
@@ -50,8 +61,10 @@ def Csrs():
             csr <<= io.write.wdata
 
     MapCsr(0x00, enable_rc)
+    MapCsr(0x01, iref)
 
     for i in range(4):
         MapCsr(0x04 + i, clock_period[i])
         MapCsr(0x08 + i, clock_threshold[i])
         MapCsr(0x0C + i, disp_cycles[i])
+        MapCsr(0x10 + i, delay_cycles[i])

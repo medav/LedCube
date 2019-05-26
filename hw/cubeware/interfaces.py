@@ -42,11 +42,13 @@ i2c_config = {
 }
 
 tlc_config = {
-    'i2c_config': i2c_config,
+    'i2c_config': i2c_config
 }
 
 refresh_config = {
     'disp_cycles': Bits(32),
+    'delay_cycles': Bits(32),
+    'iref': Bits(8),
     'enable': Bits(8)
 }
 
